@@ -1,12 +1,12 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, SafeAreaView } from 'react-native';
+import { View, Text, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
+import { GradientScreen } from '../components/GradientScreen';
 
 export default function OnboardingLocalizacao() {
   const router = useRouter();
 
   return (
-    <SafeAreaView className="flex-1 bg-gradient-to-b from-sky-900 via-sky-600 to-teal-400 justify-between p-6">
+    <GradientScreen className="justify-between p-6">
       <Text className="text-white text-lg font-serif">DirecionaSus</Text>
 
       <View className="items-center justify-center flex-1">
@@ -21,19 +21,19 @@ export default function OnboardingLocalizacao() {
       </View>
 
       <View className="flex-row items-center justify-between pb-4">
-        <View className="flex-row space-x-1.5">
-          <View className="w-2 h-2 bg-sky-300/50 rounded-full" />
-          <View className="w-2 h-2 bg-sky-300/50 rounded-full" />
+        <View className="flex-row">
+          <View className="w-2 h-2 bg-sky-300 rounded-full mr-1.5" />
+          <View className="w-2 h-2 bg-sky-300 rounded-full mr-1.5" />
           <View className="w-6 h-2 bg-white rounded-full" />
         </View>
 
-        <TouchableOpacity 
-          onPress={() => router.push('/chatbot')}
+        <TouchableOpacity
+          onPress={() => router.push('/chat')}
           className="bg-sky-900 px-6 py-2.5 rounded-full"
         >
           <Text className="text-white font-bold text-xs">Começar</Text>
         </TouchableOpacity>
       </View>
-    </SafeAreaView>
+    </GradientScreen>
   );
 }
