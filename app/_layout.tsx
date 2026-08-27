@@ -1,16 +1,10 @@
 import { Stack } from 'expo-router';
-import '../global.css';
+import { AppProvider } from '../context/AppContext';
 
-export default function RootLayout() {
+export default function Layout() {
   return (
-    <Stack screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="index" />
-      <Stack.Screen name="login" />
-      <Stack.Screen name="cadastro" />
-      <Stack.Screen name="boas-vindas" />
-      <Stack.Screen name="direcionamento" />
-      <Stack.Screen name="localizacao" />
-      <Stack.Screen name="chat" />
-    </Stack>
+    <AppProvider>
+      <Stack screenOptions={{ headerShown: false }} />
+    </AppProvider>
   );
 }

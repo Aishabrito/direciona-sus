@@ -1,37 +1,44 @@
-import { View, Text, TouchableOpacity } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
+import { useState } from 'react';
+import { useApp } from '../context/AppContext';
 import { GradientScreen } from '../components/GradientScreen';
 
-export default function OnboardingLocalizacao() {
+export default function LocalizacaoScreen() {
   const router = useRouter();
+  const { salvarLocalizacao } = useApp();
+  const [bairro, setBairro] = useState('');
+  const [municipio, setMunicipio] = useState('');
+
+  const handleSalvar = async () => {
+    await salvarLocalizacao({ bairro, municipio });
+    router.push('/chat');
+  };
 
   return (
     <GradientScreen className="justify-between p-6">
       <Text className="text-white text-lg font-serif">DirecionaSus</Text>
-
-      <View className="items-center justify-center flex-1">
-        <View className="w-full">
-          <Text className="text-white text-2xl font-serif mb-3">
-            Encontre unidades próximas
-          </Text>
-          <Text className="text-sky-100 text-sm leading-5">
-            Localize postos de saúde perto de você, consulte horários de funcionamento e veja quais serviços estão disponíveis.
-          </Text>
-        </View>
-      </View>
-
-      <View className="flex-row items-center justify-between pb-4">
-        <View className="flex-row">
-          <View className="w-2 h-2 bg-sky-300 rounded-full mr-1.5" />
-          <View className="w-2 h-2 bg-sky-300 rounded-full mr-1.5" />
-          <View className="w-6 h-2 bg-white rounded-full" />
-        </View>
-
+      <View className="flex-1 justify-center">
+        <Text className="text-white text-2xl font-serif mb-6">Onde você está?</Text>
+        <TextInput
+          placeholder="Bairro"
+          placeholderTextColor="#93c5fd"
+          value={bairro}
+          onChangeText={setBairro}
+          className="border-b border-sky-200 text-white py-2 px-1 text-base mb-4"
+        />
+        <TextInput
+          placeholder="Município"
+          placeholderTextColor="#93c5fd"
+          value={municipio}
+          onChangeText={setMunicipio}
+          className="border-b border-sky-200 text-white py-2 px-1 text-base mb-6"
+        />
         <TouchableOpacity
-          onPress={() => router.push('/chat')}
-          className="bg-sky-900 px-6 py-2.5 rounded-full"
+          onPress={handleSalvar}
+          className="bg-sky-900 py-3.5 rounded-full items-center"
         >
-          <Text className="text-white font-bold text-xs">Começar</Text>
+          <Text className="text-white font-bold tracking-widest text-sm">CONTINUAR</Text>
         </TouchableOpacity>
       </View>
     </GradientScreen>
