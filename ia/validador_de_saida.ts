@@ -1,3 +1,4 @@
+// ia/validador_de_saida.ts
 import {
   IDADE_GRUPOS,
   RELATO_VAZIO,
@@ -104,6 +105,10 @@ export function validarRelato(entrada: unknown): { ok: true; relato: RelatoEstru
     risco_mental: risco,
     informacao_insuficiente: Boolean(bruto.informacao_insuficiente),
     informacoes_contraditorias: asLista(bruto.informacoes_contraditorias),
+    // NOVOS CAMPOS (opcionais)
+    sinais_obstetricos: asLista(bruto.sinais_obstetricos),
+    sinais_trauma: asLista(bruto.sinais_trauma),
+    texto_original_acumulado: asString(bruto.texto_original_acumulado, ''),
   };
 
   const formatoOk =
@@ -117,12 +122,20 @@ export function validarRelato(entrada: unknown): { ok: true; relato: RelatoEstru
 export function mesclarRelatos(base: RelatoEstruturado, extra: RelatoEstruturado): RelatoEstruturado {
   const preferir = <T>(atual: T, novo: T, vazio: T) => (novo !== vazio ? novo : atual);
 
+  // Função auxiliar para unir arrays sem duplicatas
+  const unirArrays = (a: string[] = [], b: string[] = []) => [...new Set([...a, ...b])];
+
   return {
     relato_sobre_terceiro: extra.relato_sobre_terceiro || base.relato_sobre_terceiro,
     pessoa: extra.pessoa !== 'nao_informado' ? extra.pessoa : base.pessoa,
     idade_grupo: extra.idade_grupo !== 'nao_informado' ? extra.idade_grupo : base.idade_grupo,
-    sintomas: [...new Set([...base.sintomas, ...extra.sintomas])],
-    sinais_alerta: [...new Set([...base.sinais_alerta, ...extra.sinais_alerta])],
+    sintomas: unirArrays(base.sintomas, extra.sintomas),
+    sinais_alerta: unirArrays(base.sinais_alerta, extra.sinais_alerta),
+    // NOVOS CAMPOS: mescla os arrays
+    sinais_obstetricos: unirArrays(base.sinais_obstetricos, extra.sinais_obstetricos),
+    sinais_trauma: unirArrays(base.sinais_trauma, extra.sinais_trauma),
+    // texto original: prefere o mais recente (extra) ou mantém base
+    texto_original_acumulado: extra.texto_original_acumulado || base.texto_original_acumulado || '',
     inicio: preferir(base.inicio, extra.inicio, 'nao_informado'),
     duracao: preferir(base.duracao, extra.duracao, 'nao_informado'),
     piora: extra.piora !== 'nao_informado' ? extra.piora : base.piora,
@@ -143,8 +156,6 @@ export function mesclarRelatos(base: RelatoEstruturado, extra: RelatoEstruturado
     pos_parto: extra.pos_parto !== 'nao_informado' ? extra.pos_parto : base.pos_parto,
     risco_mental: extra.risco_mental !== 'nao_mencionado' ? extra.risco_mental : base.risco_mental,
     informacao_insuficiente: extra.informacao_insuficiente && base.informacao_insuficiente,
-    informacoes_contraditorias: [
-      ...new Set([...base.informacoes_contraditorias, ...extra.informacoes_contraditorias]),
-    ],
+    informacoes_contraditorias: unirArrays(base.informacoes_contraditorias, extra.informacoes_contraditorias),
   };
 }

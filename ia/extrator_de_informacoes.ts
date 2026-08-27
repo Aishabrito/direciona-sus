@@ -1,3 +1,4 @@
+// ia/extrator_de_informacoes.ts
 import { contemAlgum, normalizarTexto, unicos } from './normalizar';
 import { RELATO_VAZIO, type RelatoEstruturado } from './tipos';
 import { validarRelato } from './validador_de_saida';
@@ -22,6 +23,36 @@ function marcar(flag: boolean, lista: string[], rotulo: string) {
   if (flag) lista.push(rotulo);
 }
 
+// ---- NOVAS FUNÇÕES DE EXTRAÇÃO ESPECIALIZADA ----
+function extrairSinaisObstetricos(n: string): string[] {
+  const sinais: string[] = [];
+  if (/(contra[cç][oõ]es?|contraindo|dor de parto|contração)/i.test(n))
+    sinais.push('contracoes');
+  if (/(bolsa estourou|perda de l[ií]quido|rompeu a bolsa|saiu [aá]gua|líquido amniotico)/i.test(n))
+    sinais.push('perda_liquido_amniotico');
+  if (/(press[aã]o alta|hipertens[aã]o|press[aã]o [1-2][0-9]{2})/i.test(n))
+    sinais.push('pressao_alta');
+  if (sinais.includes('pressao_alta') && /dor de cabe[cç]a intensa|enxaqueca|cefaleia intensa/i.test(n))
+    sinais.push('pre_eclampsia');
+  if (/sangramento vaginal|perda de sangue|hemorragia obstétrica/i.test(n))
+    sinais.push('sangramento_obstetrico');
+  return sinais;
+}
+
+function extrairSinaisTrauma(n: string): string[] {
+  const sinais: string[] = [];
+  if (/(atropelamento|atropelado|acidente de trânsito|colisão|capotamento|carro|moto)/i.test(n))
+    sinais.push('trauma_automobilistico');
+  if (/(queda de altura|queda de [1-9] metros|caiu de [1-9] andar|precipitação)/i.test(n))
+    sinais.push('queda_altura');
+  if (/(ferimento por arma|faca|tiro|perfuração|esfaqueado)/i.test(n))
+    sinais.push('ferimento_perfurante');
+  if (/(trauma craniano|batida na cabeça|concussão|pancada na cabeça)/i.test(n))
+    sinais.push('trauma_craniano');
+  return sinais;
+}
+// -------------------------------------------------
+
 export function extrairInformacoes(texto: string): RelatoEstruturado {
   const n = normalizarTexto(texto);
   const sintomas: string[] = [];
@@ -43,14 +74,10 @@ export function extrairInformacoes(texto: string): RelatoEstruturado {
   const sangramento = contemAlgum(n, ['sangramento', 'sangrando', 'sangue', 'hemorragia']);
   const febre = contemAlgum(n, ['febre', 'febril', 'quentura']);
   const vomitos = contemAlgum(n, ['vomito', 'vomitando', 'enjoo forte']);
+  // TRAUMA – agora capturamos mais mecanismos
   const trauma = contemAlgum(n, [
-    'caiu',
-    'queda',
-    'bateu a cabeca',
-    'atropel',
-    'acidente',
-    'queda de altura',
-    'trauma',
+    'caiu', 'queda', 'bateu a cabeca', 'atropel', 'acidente',
+    'queda de altura', 'trauma', 'colisao', 'capotamento',
   ]);
   const intoxicacao = contemAlgum(n, ['intoxic', 'envenen', 'tomou produto', 'ingestao de']);
   const convulsao = contemAlgum(n, ['convulsao', 'convulsao', 'ataque convulsivo']);
@@ -110,6 +137,7 @@ export function extrairInformacoes(texto: string): RelatoEstruturado {
     'vai se machucar agora',
   ]);
 
+  // Sintomas
   if (faltaDeAr) sintomas.push('falta de ar');
   if (dorPeito) sintomas.push('dor no peito');
   if (desmaio) sintomas.push('desmaio');
@@ -117,7 +145,19 @@ export function extrairInformacoes(texto: string): RelatoEstruturado {
   if (sangramento) sintomas.push('sangramento');
   if (febre) sintomas.push('febre');
   if (vomitos) sintomas.push('vômitos');
-  if (trauma) sintomas.push(contemAlgum(n, ['cabeça', 'cabeca']) ? 'trauma na cabeça' : 'queda');
+
+  // CORREÇÃO: trauma agora guarda o mecanismo, não apenas "queda"
+  if (trauma) {
+    if (contemAlgum(n, ['atropel', 'acidente', 'colisao', 'capotamento'])) {
+      sintomas.push('trauma por acidente');
+    } else if (contemAlgum(n, ['queda de altura', 'caiu de', 'precipitação'])) {
+      sintomas.push('trauma por queda de altura');
+    } else if (contemAlgum(n, ['cabeça', 'cabeca', 'concussão'])) {
+      sintomas.push('trauma na cabeça');
+    } else {
+      sintomas.push('trauma');
+    }
+  }
   if (intoxicacao) sintomas.push('intoxicação');
   if (convulsao) sintomas.push('convulsão');
   if (dorAbdomen) sintomas.push('dor abdominal');
@@ -136,6 +176,7 @@ export function extrairInformacoes(texto: string): RelatoEstruturado {
   if (saudeMentalSofrimento) sintomas.push('sofrimento psíquico');
   if (contemAlgum(n, ['dor no corpo', 'dor pelo corpo'])) sintomas.push('dor no corpo');
 
+  // Sinais de alerta
   marcar(trauma, sinais, 'trauma');
   marcar(confusao, sinais, 'alteração da consciência');
   marcar(faltaDeAr, sinais, 'falta_de_ar');
@@ -144,6 +185,18 @@ export function extrairInformacoes(texto: string): RelatoEstruturado {
   marcar(riscoIminente, sinais, 'risco_iminente_autoagressao');
   marcar(convulsao, sinais, 'convulsao');
 
+  // --- NOVA EXTRAÇÃO DE SINAIS OBSTÉTRICOS E TRAUMA ---
+  const sinaisObstetricos = extrairSinaisObstetricos(n);
+  const sinaisTrauma = extrairSinaisTrauma(n);
+  // Adicionamos também ao array de sinais_alerta para consistência
+  if (sinaisObstetricos.length) {
+    sinais.push(...sinaisObstetricos);
+  }
+  if (sinaisTrauma.length) {
+    sinais.push(...sinaisTrauma);
+  }
+
+  // Identificação de pessoa
   let pessoa = 'nao_informado';
   let terceiro = false;
   for (const [chave, rotulo] of Object.entries(TERCEIROS)) {
@@ -185,7 +238,9 @@ export function extrairInformacoes(texto: string): RelatoEstruturado {
     confusao ||
     febre ||
     trauma ||
-    riscoIminente;
+    riscoIminente ||
+    sinaisObstetricos.length > 0 ||
+    sinaisTrauma.length > 0;
 
   const bruto: RelatoEstruturado = {
     ...RELATO_VAZIO,
@@ -216,15 +271,20 @@ export function extrairInformacoes(texto: string): RelatoEstruturado {
     risco_mental: riscoMental,
     informacao_insuficiente: !temConteudoClinico,
     informacoes_contraditorias: [],
+    // NOVOS CAMPOS
+    sinais_obstetricos: unicos(sinaisObstetricos),
+    sinais_trauma: unicos(sinaisTrauma),
   };
 
   return validarRelato(bruto).relato;
 }
 
 export async function interpretarRelato(texto: string): Promise<RelatoEstruturado> {
+  // Extração determinística, mas mantemos a estrutura para compatibilidade
   const primeira = extrairInformacoes(texto);
   const validado = validarRelato(primeira);
   if (validado.ok) return validado.relato;
+  // Se falhar, reextrai (mesmo resultado, mas mantido)
   const segunda = extrairInformacoes(texto);
   const revalidado = validarRelato(segunda);
   return revalidado.relato;

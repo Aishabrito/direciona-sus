@@ -1,3 +1,4 @@
+// ia/tipos.ts
 export const VERSAO_REGRAS = '1.0.0';
 
 export const IDADE_GRUPOS = [
@@ -69,6 +70,10 @@ export type RelatoEstruturado = {
   risco_mental: RiscoMental;
   informacao_insuficiente: boolean;
   informacoes_contraditorias: string[];
+  // NOVOS CAMPOS
+  sinais_obstetricos?: string[];
+  sinais_trauma?: string[];
+  texto_original_acumulado?: string;
 };
 
 export type DecisaoRegras = {
@@ -102,6 +107,7 @@ export type EstadoConversa = {
   relatos: RelatoEstruturado[];
   rodadasPerguntas: number;
   temaPergunta?: string;
+  texto_original_acumulado: string;
 };
 
 export const RELATO_VAZIO: RelatoEstruturado = {
@@ -128,4 +134,7 @@ export const RELATO_VAZIO: RelatoEstruturado = {
   risco_mental: 'nao_mencionado',
   informacao_insuficiente: true,
   informacoes_contraditorias: [],
+  sinais_obstetricos: [],
+  sinais_trauma: [],
+  texto_original_acumulado: '',
 };
