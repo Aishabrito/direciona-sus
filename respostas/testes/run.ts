@@ -5,8 +5,8 @@ import {
   aplicarMotor,
   processarTurno,
   ESTADO_INICIAL,
-} from '../ia';
-import { mensagemPorId, sanitizarResposta } from '../ia/mensagens';
+} from '../../ia';
+import { mensagemPorId, sanitizarResposta } from '../../ia/mensagens';
 import cenarios from './cenarios_simulados.json';
 import esperados from './resultados_esperados.json';
 

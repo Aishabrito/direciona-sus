@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import {
   View,
   Text,
@@ -9,10 +9,13 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  StyleSheet,
+  ViewStyle,
 } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
+import Svg, { Path } from 'react-native-svg';
 import { useApp } from '../context/AppContext';
 
 type AuthMode = 'login' | 'signup';
@@ -37,18 +40,14 @@ export default function LoginScreen() {
 
   const handleSubmit = () => {
     if (isLogin) {
-      // Lógica de login
       console.log('Login:', { email, senha });
-      // Após login, vá para boas-vindas
       router.replace('/boas-vindas');
     } else {
-      // Lógica de cadastro
       if (senha !== confirmarSenha) {
         alert('As senhas não coincidem');
         return;
       }
       console.log('Cadastro:', { nome, email, senha });
-      // Salvar nome/email no contexto (opcional)
       salvarPerfil({ idade: null, gestante: 'nao_informado' });
       router.replace('/boas-vindas');
     }
@@ -56,7 +55,7 @@ export default function LoginScreen() {
 
   return (
     <KeyboardAvoidingView
-      className="flex-1 bg-[#f0f4f8]"
+      style={{ flex: 1, backgroundColor: '#f0f4f8' }}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
       <StatusBar barStyle="light-content" />
@@ -64,62 +63,99 @@ export default function LoginScreen() {
         contentContainerStyle={{ flexGrow: 1 }}
         keyboardShouldPersistTaps="handled"
       >
-        {/* Header com gradiente */}
+        {/* HEADER COM GRADIENTE + ONDAS */}
         <LinearGradient
           colors={['#142e66', '#3380b2', '#59d9d1']}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
           style={{
             height: 280,
-            borderBottomLeftRadius: 30,
-            borderBottomRightRadius: 30,
             justifyContent: 'center',
             alignItems: 'center',
             paddingTop: 40,
+            overflow: 'hidden',
           }}
         >
-          <Text className="text-white text-4xl font-bold font-serif tracking-widest">
-            Direciona Saude
-          </Text>
-          <Text className="text-sky-200 text-sm mt-1 tracking-widest">
-            Acesso facilitado à saúde
-          </Text>
+          <Svg
+            width="100%"
+            height="140"
+            viewBox="0 0 400 140"
+            style={{ position: 'absolute', bottom: 0, left: 0 }}
+          >
+            <Path
+              d="M0 90 Q 100 60, 200 88 T 400 82"
+              fill="none"
+              stroke="#ffffff"
+              strokeWidth={1.5}
+              opacity={0.35}
+            />
+            <Path
+              d="M0 100 Q 100 75, 200 98 T 400 92"
+              fill="none"
+              stroke="#ffffff"
+              strokeWidth={1.5}
+              opacity={0.25}
+            />
+            <Path
+              d="M0 110 Q 100 92, 200 106 T 400 100"
+              fill="none"
+              stroke="#ffffff"
+              strokeWidth={1.5}
+              opacity={0.18}
+            />
+            <Path
+              d="M0 120 Q 100 105, 200 115 T 400 110"
+              fill="none"
+              stroke="#ffffff"
+              strokeWidth={1.5}
+              opacity={0.12}
+            />
+          </Svg>
+
+          <Image
+            source={require('../assets/logopura.png')}
+            style={{ width: 176, height: 176, marginTop: 24 }}
+            resizeMode="contain"
+          />
         </LinearGradient>
 
-        {/* Conteúdo do formulário */}
-        <View className="flex-1 px-7 pt-7 pb-5">
-          {/* Alternador login/cadastro */}
-          <View className="flex-row h-[54px] bg-[#e8eef5] rounded-[27px] p-1 shadow-[inset_2px_2px_6px_rgba(0,0,0,0.1),inset_-1px_-1px_4px_rgba(255,255,255,0.5)]">
+        {/* CONTEÚDO DO FORMULÁRIO */}
+        <View className="flex-1 px-7 pt-6 pb-5">
+
+          {/* Alternador Entrar / Cadastrar */}
+          <View style={styles.switcherTrack}>
             {(['login', 'signup'] as AuthMode[]).map((modo) => {
               const ativo = mode === modo;
               return (
                 <TouchableOpacity
                   key={modo}
-                  className={`flex-1 items-center justify-center rounded-[23px] ${
-                    ativo ? 'bg-[linear-gradient(90deg,#142e66,#3380b2)] shadow-md' : ''
-                  }`}
+                  className="flex-1 items-center justify-center rounded-[23px]"
                   onPress={() => setMode(modo)}
                   activeOpacity={0.7}
                 >
-                  <Text
-                    className={
-                      ativo
-                        ? 'text-white font-bold text-sm'
-                        : 'text-slate-500 font-semibold text-sm'
-                    }
-                  >
-                    {modo === 'login' ? 'Entrar' : 'Cadastrar'}
-                  </Text>
+                  {ativo ? (
+                    <LinearGradient
+                      colors={['#142e66', '#3380b2']}
+                      start={{ x: 0, y: 0 }}
+                      end={{ x: 1, y: 0 }}
+                      style={[styles.switcherActive, styles.softShadow]}
+                    >
+                      <Text className="text-white font-bold text-sm">
+                        {modo === 'login' ? 'Entrar' : 'Cadastrar'}
+                      </Text>
+                    </LinearGradient>
+                  ) : (
+                    <Text className="text-slate-500 font-semibold text-sm">
+                      {modo === 'login' ? 'Entrar' : 'Cadastrar'}
+                    </Text>
+                  )}
                 </TouchableOpacity>
               );
             })}
           </View>
 
-          {/* Campos do formulário */}
+          {/* CAMPOS DO FORMULÁRIO */}
           <View className="mt-5 gap-3.5">
-            {/* Nome completo (apenas no cadastro) */}
             {mode === 'signup' && (
-              <View className="flex-row items-center h-14 bg-[#edf1f7] rounded-[18px] border-[1.5px] border-white px-4 shadow-[inset_3px_3px_6px_rgba(178,189,204,0.3),inset_-2px_-2px_4px_rgba(255,255,255,0.8)]">
+              <View style={styles.inputField}>
                 <Ionicons name="person-outline" size={20} color="#64748b" />
                 <TextInput
                   className="flex-1 ml-3 text-slate-600 font-medium text-[15px]"
@@ -132,8 +168,7 @@ export default function LoginScreen() {
               </View>
             )}
 
-            {/* Email */}
-            <View className="flex-row items-center h-14 bg-[#edf1f7] rounded-[18px] border-[1.5px] border-white px-4 shadow-[inset_3px_3px_6px_rgba(178,189,204,0.3),inset_-2px_-2px_4px_rgba(255,255,255,0.8)]">
+            <View style={styles.inputField}>
               <Ionicons name="mail-outline" size={20} color="#64748b" />
               <TextInput
                 className="flex-1 ml-3 text-slate-600 font-medium text-[15px]"
@@ -146,8 +181,7 @@ export default function LoginScreen() {
               />
             </View>
 
-            {/* Senha */}
-            <View className="flex-row items-center h-14 bg-[#edf1f7] rounded-[18px] border-[1.5px] border-white px-4 shadow-[inset_3px_3px_6px_rgba(178,189,204,0.3),inset_-2px_-2px_4px_rgba(255,255,255,0.8)]">
+            <View style={styles.inputField}>
               <Ionicons name="lock-closed-outline" size={20} color="#64748b" />
               <TextInput
                 className="flex-1 ml-3 text-slate-600 font-medium text-[15px]"
@@ -167,9 +201,8 @@ export default function LoginScreen() {
               </TouchableOpacity>
             </View>
 
-            {/* Confirmar senha (apenas cadastro) */}
             {mode === 'signup' && (
-              <View className="flex-row items-center h-14 bg-[#edf1f7] rounded-[18px] border-[1.5px] border-white px-4 shadow-[inset_3px_3px_6px_rgba(178,189,204,0.3),inset_-2px_-2px_4px_rgba(255,255,255,0.8)]">
+              <View style={styles.inputField}>
                 <Ionicons name="lock-closed-outline" size={20} color="#64748b" />
                 <TextInput
                   className="flex-1 ml-3 text-slate-600 font-medium text-[15px]"
@@ -184,7 +217,6 @@ export default function LoginScreen() {
             )}
           </View>
 
-          {/* Esqueceu a senha (apenas login) */}
           {isLogin && (
             <TouchableOpacity className="self-end mt-1.5" onPress={() => {}}>
               <Text className="text-[#3380b2] font-semibold text-[13px]">
@@ -193,9 +225,9 @@ export default function LoginScreen() {
             </TouchableOpacity>
           )}
 
-          {/* Botão principal */}
+          {/* BOTÃO PRINCIPAL */}
           <TouchableOpacity
-            className="h-14 rounded-[28px] mt-6 items-center justify-center shadow-[0px_8px_20px_rgba(20,46,102,0.31)]"
+            style={[styles.mainButton, styles.mainButtonShadow]}
             onPress={handleSubmit}
             activeOpacity={0.8}
           >
@@ -203,13 +235,7 @@ export default function LoginScreen() {
               colors={['#142e66', '#3380b2', '#3ea8c0']}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 0 }}
-              style={{
-                width: '100%',
-                height: '100%',
-                borderRadius: 28,
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
+              style={styles.mainButtonGradient}
             >
               <Text className="text-white font-bold text-base tracking-widest">
                 {tituloBotao}
@@ -217,7 +243,7 @@ export default function LoginScreen() {
             </LinearGradient>
           </TouchableOpacity>
 
-          {/* Divisor com "Ou entrar com:" */}
+          {/* DIVISOR */}
           <View className="flex-row items-center justify-center gap-3.5 mt-6">
             <View className="h-px flex-1 max-w-[70px] bg-slate-300" />
             <Text className="text-slate-400 font-medium text-xs">
@@ -226,28 +252,149 @@ export default function LoginScreen() {
             <View className="h-px flex-1 max-w-[70px] bg-slate-300" />
           </View>
 
-          {/* Botões sociais */}
+          {/* BOTÕES SOCIAIS */}
           <View className="flex-row justify-center gap-5 mt-3">
             <TouchableOpacity
-              className="w-14 h-14 bg-[#edf1f7] rounded-[28px] border-[1.5px] border-white items-center justify-center shadow-[4px_4px_8px_rgba(178,189,204,0.25),inset_-2px_-2px_4px_rgba(255,255,255,0.5)]"
+              style={[styles.socialButton, styles.softShadow]}
               onPress={() => console.log('Google')}
             >
               <Text className="text-slate-700 font-bold text-lg">G</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              className="w-14 h-14 bg-[#edf1f7] rounded-[28px] border-[1.5px] border-white items-center justify-center shadow-[4px_4px_8px_rgba(178,189,204,0.25),inset_-2px_-2px_4px_rgba(255,255,255,0.5)]"
+              style={[styles.socialButton, styles.softShadow]}
               onPress={() => console.log('Apple')}
             >
               <Ionicons name="logo-apple" size={24} color="#1e293b" />
             </TouchableOpacity>
           </View>
 
-          {/* Rodapé – indicador de página (apenas visual) */}
-          <View className="h-[34px] items-center justify-center mt-4">
+          {/* RODAPÉ - ALTERNÂNCIA DE MODO */}
+          <TouchableOpacity
+            className="mt-4 items-center py-2"
+            onPress={() => setMode(isLogin ? 'signup' : 'login')}
+          >
+            <Text className="text-slate-500 text-sm font-medium">
+              {isLogin ? 'Não tem uma conta? ' : 'Já tem uma conta? '}
+              <Text className="text-[#3380b2] font-bold underline">
+                {isLogin ? 'Cadastre-se' : 'Faça login'}
+              </Text>
+            </Text>
+          </TouchableOpacity>
+
+          {/* INDICADOR INFERIOR */}
+          <View className="h-[34px] items-center justify-center mt-2">
             <View className="w-[134px] h-[5px] bg-black/20 rounded-[100px]" />
           </View>
+
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
   );
 }
+
+// Sombras e efeito "afundado" via StyleSheet nativo (funciona igual em iOS/Android,
+// diferente de classes arbitrárias tailwind tipo shadow-[inset_...] que não renderizam em RN)
+const styles = StyleSheet.create({
+  // Campos de input: simula profundidade com bordas bicolor
+  // (mais escura em cima/esquerda = "sombra entrando", mais clara embaixo/direita = "brilho saindo")
+  inputField: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    height: 56,
+    backgroundColor: '#edf1f7',
+    borderRadius: 18,
+    paddingHorizontal: 16,
+    borderTopWidth: 1.5,
+    borderLeftWidth: 1.5,
+    borderTopColor: 'rgba(160,172,194,0.45)',
+    borderLeftColor: 'rgba(160,172,194,0.45)',
+    borderBottomWidth: 1.5,
+    borderRightWidth: 1.5,
+    borderBottomColor: 'rgba(255,255,255,0.9)',
+    borderRightColor: 'rgba(255,255,255,0.9)',
+    ...Platform.select({
+      ios: {
+        shadowColor: '#b2bdcc',
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.25,
+        shadowRadius: 1.5,
+      },
+      android: {
+        elevation: 1,
+      },
+    }),
+  },
+
+  switcherTrack: {
+    flexDirection: 'row',
+    height: 54,
+    backgroundColor: '#e8eef5',
+    borderRadius: 27,
+    padding: 4,
+    borderTopWidth: 1.5,
+    borderLeftWidth: 1.5,
+    borderTopColor: 'rgba(160,172,194,0.35)',
+    borderLeftColor: 'rgba(160,172,194,0.35)',
+    borderBottomWidth: 1.5,
+    borderRightWidth: 1.5,
+    borderBottomColor: 'rgba(255,255,255,0.8)',
+    borderRightColor: 'rgba(255,255,255,0.8)',
+  },
+  switcherActive: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 23,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
+  mainButton: {
+    height: 56,
+    borderRadius: 28,
+    marginTop: 24,
+  },
+  mainButtonGradient: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 28,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  mainButtonShadow: Platform.select({
+    ios: {
+      shadowColor: '#142e66',
+      shadowOffset: { width: 0, height: 8 },
+      shadowOpacity: 0.31,
+      shadowRadius: 12,
+    },
+    android: {
+      elevation: 8,
+    },
+    default: {},
+  }) as ViewStyle,
+
+  socialButton: {
+    width: 56,
+    height: 56,
+    backgroundColor: '#edf1f7',
+    borderRadius: 28,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1.5,
+    borderColor: '#ffffff',
+  },
+
+  // sombra externa leve reutilizável (alternador ativo, botões sociais)
+  softShadow: Platform.select({
+    ios: {
+      shadowColor: '#b2bdcc',
+      shadowOffset: { width: 2, height: 3 },
+      shadowOpacity: 0.35,
+      shadowRadius: 4,
+    },
+    android: {
+      elevation: 3,
+    },
+    default: {},
+  }) as ViewStyle,
+});

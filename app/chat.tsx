@@ -9,6 +9,8 @@ import {
   Platform,
   FlatList,
   StatusBar,
+  StyleSheet,
+  ViewStyle,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
@@ -255,33 +257,34 @@ export default function ChatScreen() {
               ))}
             </View>
 
-            <View className="bg-[#f0f4f8]/80 px-4 pb-2 pt-3.5 shadow-[0_-4px_12px_rgba(0,0,0,0.05)]">
+            <View style={styles.inputBar}>
               <View className="flex-row items-center gap-2.5">
-                {/* Botão de anexo (apenas visual) */}
+                {/* Botão "+" escuro (apenas visual) */}
                 <TouchableOpacity
-                  className="w-11 h-11 rounded-full bg-[#edf1f7] border-[1.5px] border-white items-center justify-center shadow-[3px_3px_6px_rgba(178,189,204,0.25),inset_-2px_-2px_4px_rgba(255,255,255,0.5)]"
+                  className="w-11 h-11 rounded-full bg-[#142e66] items-center justify-center"
                   disabled
                 >
-                  <Ionicons name="attach" size={20} color="#525bab" />
+                  <Ionicons name="add" size={22} color="#ffffff" />
                 </TouchableOpacity>
 
-                {/* Campo de texto com estilo neumorphism */}
-                <View className="flex-1 h-11 rounded-full bg-[#edf1f7] border-[1.5px] border-white px-4 justify-center shadow-[inset_3px_3px_6px_rgba(178,189,204,0.3),inset_-2px_-2px_4px_rgba(255,255,255,0.8)]">
+                {/* Campo de texto com estilo neumorphism + ícone de microfone */}
+                <View style={[styles.textField, { flex: 1 }]}>
                   <TextInput
                     placeholder="Digite sua mensagem..."
                     placeholderTextColor="#94a3b8"
                     value={inputText}
                     onChangeText={setInputText}
                     editable={!busy}
-                    className="text-sm font-medium text-slate-400"
+                    className="flex-1 text-sm font-medium text-slate-400"
                   />
+                  <Ionicons name="mic-outline" size={18} color="#94a3b8" />
                 </View>
 
                 {/* Botão de enviar com gradiente */}
                 <TouchableOpacity
                   onPress={() => handleSend()}
                   disabled={busy}
-                  className="w-11 h-11 rounded-full items-center justify-center shadow-[0px_4px_10px_rgba(20,46,102,0.31)]"
+                  style={styles.sendButtonShadow}
                 >
                   <LinearGradient
                     colors={['#142e66', '#3380b2', '#3ea8c0']}
@@ -295,7 +298,7 @@ export default function ChatScreen() {
                       justifyContent: 'center',
                     }}
                   >
-                    <Ionicons name="send" size={18} color="#ffffff" />
+                    <Ionicons name="arrow-forward" size={18} color="#ffffff" />
                   </LinearGradient>
                 </TouchableOpacity>
               </View>
@@ -318,3 +321,74 @@ export default function ChatScreen() {
     </SafeAreaView>
   );
 }
+
+// Sombras via StyleSheet nativo (funciona igual em iOS/Android — classes arbitrárias
+// tipo shadow-[inset_...] não renderizam de fato no React Native)
+const styles = StyleSheet.create({
+  inputBar: {
+    backgroundColor: 'rgba(240,244,248,0.8)',
+    paddingHorizontal: 16,
+    paddingBottom: 8,
+    paddingTop: 14,
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000000',
+        shadowOffset: { width: 0, height: -4 },
+        shadowOpacity: 0.05,
+        shadowRadius: 12,
+      },
+      android: {
+        elevation: 6,
+      },
+    }),
+  },
+
+  // Campo de texto: simula profundidade "afundada" com bordas bicolor
+  // (mais escura em cima/esquerda, mais clara embaixo/direita)
+  textField: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: '#edf1f7',
+    paddingHorizontal: 16,
+    borderTopWidth: 1.5,
+    borderLeftWidth: 1.5,
+    borderTopColor: 'rgba(160,172,194,0.45)',
+    borderLeftColor: 'rgba(160,172,194,0.45)',
+    borderBottomWidth: 1.5,
+    borderRightWidth: 1.5,
+    borderBottomColor: 'rgba(255,255,255,0.9)',
+    borderRightColor: 'rgba(255,255,255,0.9)',
+    ...Platform.select({
+      ios: {
+        shadowColor: '#b2bdcc',
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.25,
+        shadowRadius: 1.5,
+      },
+      android: {
+        elevation: 1,
+      },
+    }),
+  },
+
+  sendButtonShadow: Platform.select({
+    ios: {
+      width: 44,
+      height: 44,
+      borderRadius: 22,
+      shadowColor: '#142e66',
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.31,
+      shadowRadius: 10,
+    },
+    android: {
+      width: 44,
+      height: 44,
+      borderRadius: 22,
+      elevation: 6,
+    },
+    default: { width: 44, height: 44, borderRadius: 22 },
+  }) as ViewStyle,
+});

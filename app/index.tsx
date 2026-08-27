@@ -1,31 +1,36 @@
-import { View, Text, Pressable } from 'react-native';
+import { useEffect } from 'react';
+import { View, Text, Image } from 'react-native';
 import { useRouter } from 'expo-router';
+import { LinearGradient } from 'expo-linear-gradient';
 
-export default function TelaInicial() {
+export default function Index() {
   const router = useRouter();
 
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      router.replace('/login');
+    }, 10000);
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
-    <View className="flex-1 justify-center items-center p-6 bg-slate-50">
-      <Text className="text-3xl font-bold text-slate-900 mb-3">
+    <LinearGradient
+      colors={['#0b3b5c', '#0284c7', '#5eead4']}
+      className="flex-1 items-center justify-center"
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 1 }}
+    >
+      <Image
+        source={require('../assets/logo.png')}
+        className="w-48 h-48"
+        resizeMode="contain"
+      />
+      <Text className="text-white text-3xl font-bold mt-4 tracking-widest">
         Direciona SUS
       </Text>
-
-      <Text className="text-lg text-center text-slate-600 mb-10 leading-6">
-        Saiba o serviço de saúde certo para o seu sintoma de forma rápida e segura.
+      <Text className="text-sky-200 text-sm mt-2 tracking-widest">
+        Acesso facilitado à saúde
       </Text>
-
-      <Pressable
-        onPress={() => router.push('/login')}
-        className="bg-blue-600 py-4 px-8 rounded-xl mb-10"
-      >
-        <Text className="text-white font-bold text-lg text-center">
-          Iniciar Triagem
-        </Text>
-      </Pressable>
-
-      <Text className="absolute bottom-8 text-sm text-slate-400 text-center">
-        Atenção: Este app não fornece diagnósticos médicos.
-      </Text>
-    </View>
+    </LinearGradient>
   );
 }
