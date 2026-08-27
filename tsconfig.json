@@ -3,17 +3,16 @@
   "compilerOptions": {
     "strict": true,
     "resolveJsonModule": true,
-    "types": ["node"],
-    "moduleResolution": "node",
+    "types": [
+      "node"
+    ],
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "ignoreDeprecations": "6.0",
-    "target": "ES2020"
+    "ignoreDeprecations": "6.0"
   },
   "include": [
     "**/*.ts",
     "**/*.tsx",
-    ".expo/types/**/*.ts",
     "nativewind-env.d.ts",
     "testes/**/*.ts"
   ]

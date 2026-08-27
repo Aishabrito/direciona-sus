@@ -8,9 +8,11 @@ import {
   KeyboardAvoidingView,
   Platform,
   FlatList,
+  StatusBar,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import { LinearGradient } from 'expo-linear-gradient';
 import { ESTADO_INICIAL, processarTurno, type EstadoConversa } from '../ia';
 import { useApp } from '../context/AppContext';
 
@@ -19,6 +21,7 @@ type Message = {
   text: string;
   sender: 'user' | 'bot';
   time: string;
+  isFinal?: boolean;
 };
 
 const agora = () => new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -48,6 +51,7 @@ export default function ChatScreen() {
   const router = useRouter();
   const { perfil } = useApp();
   const flatListRef = useRef<FlatList>(null);
+  const [finalizado, setFinalizado] = useState(false);
 
   const [estado, setEstado] = useState<EstadoConversa>(() => montarEstadoInicial(perfil));
   const [busy, setBusy] = useState(false);
@@ -55,13 +59,12 @@ export default function ChatScreen() {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
-      text: 'Olá. Descreva os sintomas em linguagem simples. Eu organizo o relato; as regras do Direciona SUS escolhem a orientação. Isso não é diagnóstico nem substitui atendimento. Não envie CPF, endereço, senha ou cartão.',
+      text: 'Olá! Sou o assistente do Direciona SUS. Estou aqui para orientar você sobre os serviços de saúde disponíveis. Como posso ajudar?',
       sender: 'bot',
       time: agora(),
     },
   ]);
 
-  // Auto-scroll
   useEffect(() => {
     if (messages.length > 0) {
       flatListRef.current?.scrollToEnd({ animated: true });
@@ -76,6 +79,7 @@ export default function ChatScreen() {
   ];
 
   const handleSend = async (textToSend?: string) => {
+    if (finalizado) return;
     const text = (textToSend || inputText).trim();
     if (!text || busy) return;
 
@@ -88,22 +92,17 @@ export default function ChatScreen() {
       setEstado(novoEstado);
 
       if (resultado.tipo === 'orientacao') {
-        // Navega para direcionamento com dados seguros
-        const params = {
-          unidade: resultado.decisao.destino,
-          motivo: resultado.texto,
-          acoes: resultado.texto,
-          telefone: resultado.decisao.destino.includes('SAMU') ? '192' : '',
-        };
-        router.push({
-          pathname: '/direcionamento',
-          params: {
-            unidade: encodeURIComponent(params.unidade),
-            motivo: encodeURIComponent(params.motivo),
-            acoes: encodeURIComponent(params.acoes),
-            telefone: params.telefone,
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: String(Date.now() + 1),
+            text: resultado.texto,
+            sender: 'bot',
+            time: agora(),
+            isFinal: true,
           },
-        });
+        ]);
+        setFinalizado(true);
         return;
       }
 
@@ -120,46 +119,113 @@ export default function ChatScreen() {
           text: 'Não consegui avaliar com segurança. Procure uma UBS. Se houver falta de ar, dor no peito, desmaio, confusão ou sangramento importante, acione o SAMU 192.',
           sender: 'bot',
           time: agora(),
+          isFinal: true,
         },
       ]);
+      setFinalizado(true);
     } finally {
       setBusy(false);
     }
   };
 
-  const renderMessage = ({ item }: { item: Message }) => (
-    <View
-      className={`my-1.5 max-w-[80%] p-3 rounded-2xl ${
-        item.sender === 'user'
-          ? 'self-end bg-sky-700 rounded-br-none'
-          : 'self-start bg-sky-100 rounded-bl-none'
-      }`}
-    >
-      <Text className={item.sender === 'user' ? 'text-white' : 'text-slate-800'}>
-        {item.text}
-      </Text>
-      <Text
-        className={`text-[10px] mt-1 text-right ${
-          item.sender === 'user' ? 'text-sky-200' : 'text-gray-500'
-        }`}
-      >
-        {item.time}
-      </Text>
-    </View>
-  );
+  const handleReiniciar = () => {
+    setFinalizado(false);
+    setEstado(ESTADO_INICIAL);
+    setMessages([
+      {
+        id: '1',
+        text: 'Olá! Sou o assistente do Direciona SUS. Estou aqui para orientar você sobre os serviços de saúde disponíveis. Como posso ajudar?',
+        sender: 'bot',
+        time: agora(),
+      },
+    ]);
+    setInputText('');
+  };
+
+  const renderMessage = ({ item }: { item: Message }) => {
+    const isUser = item.sender === 'user';
+    const isFinal = item.isFinal || false;
+
+    return (
+      <View className={`my-1.5 ${isUser ? 'items-end' : 'items-start'}`}>
+        <View
+          style={{
+            maxWidth: '80%',
+            padding: 16,
+            borderRadius: isUser ? 18 : 18,
+            borderBottomRightRadius: isUser ? 4 : 18,
+            borderBottomLeftRadius: isUser ? 18 : 4,
+            backgroundColor: isUser
+              ? undefined
+              : '#ffffff',
+            borderWidth: isUser ? 0 : 1,
+            borderColor: isUser ? 'transparent' : '#e2eaf4',
+            shadowColor: '#142e66',
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: isUser ? 0.25 : 0.06,
+            shadowRadius: 8,
+            elevation: isUser ? 4 : 1,
+          }}
+        >
+          {isUser ? (
+            <LinearGradient
+              colors={['#142e66', '#3380b2', '#3ea8c0']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={{
+                borderRadius: 18,
+                borderBottomRightRadius: 4,
+                padding: 16,
+                margin: -16,
+              }}
+            >
+              <Text className="text-white font-medium text-sm leading-5">
+                {item.text}
+              </Text>
+            </LinearGradient>
+          ) : (
+            <Text
+              className={`text-sm leading-5 ${
+                isFinal ? 'text-emerald-700 font-semibold' : 'text-[#525bab]'
+              }`}
+            >
+              {item.text}
+            </Text>
+          )}
+        </View>
+        <Text className="text-[11px] text-slate-400 font-medium mt-1">
+          {item.time}
+        </Text>
+      </View>
+    );
+  };
 
   return (
-    <SafeAreaView className="flex-1 bg-sky-400">
-      <View className="flex-row items-center px-4 py-3 bg-sky-600">
-        <View className="w-10 h-10 rounded-full bg-sky-200 items-center justify-center mr-3">
-          <Ionicons name="shield-checkmark" size={24} color="#0284c7" />
-        </View>
-        <View>
-          <Text className="text-white text-lg font-bold">Direciona SUS</Text>
-          <Text className="text-sky-100 text-xs">Orientação por regras · não é diagnóstico</Text>
-        </View>
-      </View>
+    <SafeAreaView className="flex-1 bg-[#f0f4f8]">
+      <StatusBar barStyle="light-content" />
 
+      {/* Header com gradiente */}
+      <LinearGradient
+        colors={['#142e66', '#3380b2', '#59d9d1']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={{ paddingTop: 8, paddingBottom: 12 }}
+      >
+        <View className="flex-row items-center justify-between px-5">
+          <TouchableOpacity
+            onPress={() => router.back()}
+            className="p-1"
+          >
+            <Ionicons name="arrow-back" size={24} color="#ffffff" />
+          </TouchableOpacity>
+          <Text className="text-[#142e66] text-3xl font-bold font-serif">
+            Direciona Saude
+          </Text>
+          <View className="w-8" /> {/* placeholder para alinhar central */}
+        </View>
+      </LinearGradient>
+
+      {/* Área de mensagens */}
       <KeyboardAvoidingView
         className="flex-1"
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
@@ -170,41 +236,84 @@ export default function ChatScreen() {
           data={messages}
           keyExtractor={(item) => item.id}
           renderItem={renderMessage}
-          contentContainerStyle={{ paddingHorizontal: 16, paddingVertical: 8 }}
+          contentContainerStyle={{ paddingHorizontal: 20, paddingVertical: 12 }}
           className="flex-1"
         />
 
-        <View className="flex-row flex-wrap justify-center gap-2 px-3 py-2">
-          {suggestions.map((item) => (
-            <TouchableOpacity
-              key={item}
-              onPress={() => handleSend(item)}
-              className="bg-sky-800 px-4 py-2 rounded-full border border-sky-300"
-            >
-              <Text className="text-white font-medium text-xs">{item}</Text>
-            </TouchableOpacity>
-          ))}
-        </View>
+        {/* Sugestões e input (se não finalizado) */}
+        {!finalizado ? (
+          <>
+            <View className="flex-row flex-wrap justify-center gap-2 px-4 py-2">
+              {suggestions.map((item) => (
+                <TouchableOpacity
+                  key={item}
+                  onPress={() => handleSend(item)}
+                  className="bg-white px-4 py-2 rounded-full border border-[#e2eaf4] shadow-sm"
+                >
+                  <Text className="text-[#525bab] font-medium text-xs">{item}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
 
-        <View className="flex-row items-center p-3 gap-2 bg-sky-400">
-          <View className="flex-1 flex-row items-center bg-sky-100 rounded-full px-4 py-2">
-            <TextInput
-              placeholder="Descreva os sintomas..."
-              placeholderTextColor="#0369a1"
-              value={inputText}
-              onChangeText={setInputText}
-              editable={!busy}
-              className="flex-1 text-sky-950 pr-2"
-            />
+            <View className="bg-[#f0f4f8]/80 px-4 pb-2 pt-3.5 shadow-[0_-4px_12px_rgba(0,0,0,0.05)]">
+              <View className="flex-row items-center gap-2.5">
+                {/* Botão de anexo (apenas visual) */}
+                <TouchableOpacity
+                  className="w-11 h-11 rounded-full bg-[#edf1f7] border-[1.5px] border-white items-center justify-center shadow-[3px_3px_6px_rgba(178,189,204,0.25),inset_-2px_-2px_4px_rgba(255,255,255,0.5)]"
+                  disabled
+                >
+                  <Ionicons name="attach" size={20} color="#525bab" />
+                </TouchableOpacity>
+
+                {/* Campo de texto com estilo neumorphism */}
+                <View className="flex-1 h-11 rounded-full bg-[#edf1f7] border-[1.5px] border-white px-4 justify-center shadow-[inset_3px_3px_6px_rgba(178,189,204,0.3),inset_-2px_-2px_4px_rgba(255,255,255,0.8)]">
+                  <TextInput
+                    placeholder="Digite sua mensagem..."
+                    placeholderTextColor="#94a3b8"
+                    value={inputText}
+                    onChangeText={setInputText}
+                    editable={!busy}
+                    className="text-sm font-medium text-slate-400"
+                  />
+                </View>
+
+                {/* Botão de enviar com gradiente */}
+                <TouchableOpacity
+                  onPress={() => handleSend()}
+                  disabled={busy}
+                  className="w-11 h-11 rounded-full items-center justify-center shadow-[0px_4px_10px_rgba(20,46,102,0.31)]"
+                >
+                  <LinearGradient
+                    colors={['#142e66', '#3380b2', '#3ea8c0']}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 0 }}
+                    style={{
+                      width: 44,
+                      height: 44,
+                      borderRadius: 22,
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <Ionicons name="send" size={18} color="#ffffff" />
+                  </LinearGradient>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </>
+        ) : (
+          // Tela finalizada – botão de reiniciar
+          <View className="p-4 bg-[#f0f4f8] items-center">
+            <TouchableOpacity
+              onPress={handleReiniciar}
+              className="bg-white px-8 py-3 rounded-full border border-[#e2eaf4] shadow-sm"
+            >
+              <Text className="text-[#525bab] font-bold text-sm tracking-wider">
+                🔄 Nova consulta
+              </Text>
+            </TouchableOpacity>
           </View>
-          <TouchableOpacity
-            onPress={() => handleSend()}
-            className="w-12 h-12 bg-sky-200 rounded-full items-center justify-center"
-            disabled={busy}
-          >
-            <Ionicons name="send" size={20} color="#0284c7" />
-          </TouchableOpacity>
-        </View>
+        )}
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
