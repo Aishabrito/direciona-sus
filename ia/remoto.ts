@@ -1,6 +1,6 @@
 // Conversa com o mesmo bot do WhatsApp (back.direciona), pela API POST /api/chat.
 // O endereço padrão é o servidor na Suga; EXPO_PUBLIC_API_URL (no .env) pode trocá-lo.
-// Se o servidor não responder, quem chama usa o motor local do app (modo offline).
+// Se o servidor não responder, o chat usa só a guarda de emergência local (ia/offline.ts).
 
 export type RespostaBot = { tipo: 'orientacao' | 'perguntas'; texto: string };
 
@@ -8,16 +8,12 @@ const URL_PADRAO = 'https://k96kvwxcjs3h-production-6vlyfvyj.us-central1.suga.ru
 const API_URL = (process.env.EXPO_PUBLIC_API_URL || URL_PADRAO).replace(/\/+$/, '');
 const TIMEOUT_MS = 20000;
 
-export const botRemotoConfigurado = API_URL.length > 0;
-
 export function novaSessao(): string {
   return `app-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
 }
 
 /** Envia a mensagem ao bot. Devolve null se não houver servidor ou ele não responder. */
 export async function enviarAoBot(sessionId: string, mensagem: string): Promise<RespostaBot | null> {
-  if (!botRemotoConfigurado) return null;
-
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
   try {
