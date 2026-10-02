@@ -1,10 +1,11 @@
 // Conversa com o mesmo bot do WhatsApp (back.direciona), pela API POST /api/chat.
-// O endereço vem de EXPO_PUBLIC_API_URL (ex.: https://seu-servidor.com). Sem ele,
-// ou se o servidor não responder, quem chama usa o motor local do app (modo offline).
+// O endereço padrão é o servidor na Suga; EXPO_PUBLIC_API_URL (no .env) pode trocá-lo.
+// Se o servidor não responder, quem chama usa o motor local do app (modo offline).
 
 export type RespostaBot = { tipo: 'orientacao' | 'perguntas'; texto: string };
 
-const API_URL = (process.env.EXPO_PUBLIC_API_URL || '').replace(/\/+$/, '');
+const URL_PADRAO = 'https://k96kvwxcjs3h-production-6vlyfvyj.us-central1.suga.run';
+const API_URL = (process.env.EXPO_PUBLIC_API_URL || URL_PADRAO).replace(/\/+$/, '');
 const TIMEOUT_MS = 20000;
 
 export const botRemotoConfigurado = API_URL.length > 0;
