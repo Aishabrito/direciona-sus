@@ -15,10 +15,8 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
-import { ESTADO_INICIAL, type EstadoConversa } from '../ia';
-import { useApp } from '../context/AppContext';
-import { enviarAoBot, novaSessao, botRemotoConfigurado } from '../ia/remoto';
-import { processarOffline } from '../ia/offline';
+import { enviarAoBot, novaSessao } from '../ia/remoto';
+import { respostaOffline, TEXTO_SEM_CONEXAO } from '../ia/offline';
 
 type Message = {
   id: string;
@@ -29,9 +27,6 @@ type Message = {
 };
 
 const agora = () => new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-const AVISO_OFFLINE =
-  'Sem conexão com o servidor. Sigo com a orientação no modo offline do aplicativo.';
 
 // O bot usa a marcação do WhatsApp: *negrito* e _itálico_.
 function textoFormatado(texto: string) {
@@ -46,38 +41,14 @@ function textoFormatado(texto: string) {
   });
 }
 
-function montarEstadoInicial(perfil: any): EstadoConversa {
-  const base = { ...ESTADO_INICIAL };
-  if (perfil.idade) {
-    let idade_grupo: 'bebe' | 'crianca' | 'adolescente' | 'adulto' | 'idoso' | 'nao_informado' = 'nao_informado';
-    if (perfil.idade < 2) idade_grupo = 'bebe';
-    else if (perfil.idade < 12) idade_grupo = 'crianca';
-    else if (perfil.idade < 18) idade_grupo = 'adolescente';
-    else if (perfil.idade < 60) idade_grupo = 'adulto';
-    else idade_grupo = 'idoso';
-
-    if (base.relatos.length > 0) {
-      base.relatos[0] = {
-        ...base.relatos[0],
-        idade_grupo,
-        gestante: perfil.gestante || 'nao_informado',
-      };
-    }
-  }
-  return base;
-}
-
 export default function ChatScreen() {
   const router = useRouter();
-  const { perfil } = useApp();
   const flatListRef = useRef<FlatList>(null);
   const [finalizado, setFinalizado] = useState(false);
 
-  const [estado, setEstado] = useState<EstadoConversa>(() => montarEstadoInicial(perfil));
   const [busy, setBusy] = useState(false);
-  // Sessão no servidor (bot do WhatsApp). Sem servidor configurado, começa offline.
+  // Uma sessão por conversa no servidor (o mesmo bot do WhatsApp).
   const [sessionId, setSessionId] = useState(novaSessao);
-  const [offline, setOffline] = useState(!botRemotoConfigurado);
   const [inputText, setInputText] = useState('');
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -111,20 +82,8 @@ export default function ChatScreen() {
     if (!textToSend) setInputText('');
 
     try {
-      // 1º tenta o bot do servidor; se não houver conexão, usa o motor local.
-      let resultado = offline ? null : await enviarAoBot(sessionId, text);
-      if (!resultado) {
-        if (!offline) {
-          setOffline(true);
-          setMessages((prev) => [
-            ...prev,
-            { id: String(Date.now() + 3), text: AVISO_OFFLINE, sender: 'bot', time: agora() },
-          ]);
-        }
-        const local = await processarOffline(text, estado);
-        setEstado(local.estado);
-        resultado = local.resultado;
-      }
+      // Quem responde é o bot do servidor; sem conexão, só a guarda de emergência local.
+      const resultado = (await enviarAoBot(sessionId, text)) ?? respostaOffline(text);
 
       if (resultado.tipo === 'orientacao') {
         setMessages((prev) => [
@@ -146,18 +105,11 @@ export default function ChatScreen() {
         { id: String(Date.now() + 1), text: resultado.texto, sender: 'bot', time: agora() },
       ]);
     } catch (error) {
-      console.error('Erro no processarTurno:', error);
+      console.error('Erro no chat:', error);
       setMessages((prev) => [
         ...prev,
-        {
-          id: String(Date.now() + 2),
-          text: 'Não consegui avaliar com segurança. Procure uma UBS. Se houver falta de ar, dor no peito, desmaio, confusão ou sangramento importante, acione o SAMU 192.',
-          sender: 'bot',
-          time: agora(),
-          isFinal: true,
-        },
+        { id: String(Date.now() + 2), text: TEXTO_SEM_CONEXAO, sender: 'bot', time: agora() },
       ]);
-      setFinalizado(true);
     } finally {
       setBusy(false);
     }
@@ -165,9 +117,7 @@ export default function ChatScreen() {
 
   const handleReiniciar = () => {
     setFinalizado(false);
-    setEstado(ESTADO_INICIAL);
     setSessionId(novaSessao());
-    setOffline(!botRemotoConfigurado);
     setMessages([
       {
         id: '1',

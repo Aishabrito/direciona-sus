@@ -13,7 +13,6 @@
   "include": [
     "**/*.ts",
     "**/*.tsx",
-    "nativewind-env.d.ts",
-    "respostas/testes/**/*.ts"
+    "nativewind-env.d.ts"
   ]
 }

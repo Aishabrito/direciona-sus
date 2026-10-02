@@ -1,20 +1,18 @@
-// Modo offline do app: a mesma guarda de emergência do bot do servidor
-// (copiada de back.direciona/src/ia/guarda_critica.ts) roda antes do motor local,
-// para que sinais graves sempre levem ao SAMU 192 / CVV 188, mesmo sem internet.
+// Sem conexão com o servidor, o app não tenta orientar sozinho: só a guarda de
+// emergência do bot (copiada de back.direciona/src/ia/guarda_critica.ts) roda aqui,
+// para que sinais graves levem ao SAMU 192 / CVV 188 mesmo sem internet.
 import { detectarCriticoRegex, textoEmergencia } from './guarda_critica';
-import { processarTurno } from './orquestrador';
-import type { EstadoConversa } from './tipos';
+import type { RespostaBot } from './remoto';
 
-export async function processarOffline(texto: string, estado: EstadoConversa) {
+export const TEXTO_SEM_CONEXAO =
+  'Estou sem conexão com o servidor agora e não consigo te orientar com segurança. ' +
+  'Tente de novo em instantes. Se for urgente, procure uma UPA. Em emergência ' +
+  '(falta de ar, dor no peito, desmaio, confusão ou sangramento importante), ligue *192 (SAMU)*.';
+
+export function respostaOffline(texto: string): RespostaBot {
   const guarda = detectarCriticoRegex(texto);
   if (guarda.critico) {
-    return {
-      estado,
-      resultado: {
-        tipo: 'orientacao' as const,
-        texto: textoEmergencia(guarda.categoria, guarda.terceiro),
-      },
-    };
+    return { tipo: 'orientacao', texto: textoEmergencia(guarda.categoria, guarda.terceiro) };
   }
-  return processarTurno(texto, estado);
+  return { tipo: 'perguntas', texto: TEXTO_SEM_CONEXAO };
 }
