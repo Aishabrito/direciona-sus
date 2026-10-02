@@ -15,8 +15,10 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
-import { ESTADO_INICIAL, processarTurno, type EstadoConversa } from '../ia';
+import { ESTADO_INICIAL, type EstadoConversa } from '../ia';
 import { useApp } from '../context/AppContext';
+import { enviarAoBot, novaSessao, botRemotoConfigurado } from '../ia/remoto';
+import { processarOffline } from '../ia/offline';
 
 type Message = {
   id: string;
@@ -27,6 +29,22 @@ type Message = {
 };
 
 const agora = () => new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+const AVISO_OFFLINE =
+  'Sem conexão com o servidor. Sigo com a orientação no modo offline do aplicativo.';
+
+// O bot usa a marcação do WhatsApp: *negrito* e _itálico_.
+function textoFormatado(texto: string) {
+  return texto.split(/(\*[^*\n]+\*|_[^_\n]+_)/g).map((parte, i) => {
+    if (/^\*[^*]+\*$/.test(parte)) {
+      return <Text key={i} style={{ fontWeight: '700' }}>{parte.slice(1, -1)}</Text>;
+    }
+    if (/^_[^_]+_$/.test(parte)) {
+      return <Text key={i} style={{ fontStyle: 'italic' }}>{parte.slice(1, -1)}</Text>;
+    }
+    return parte;
+  });
+}
 
 function montarEstadoInicial(perfil: any): EstadoConversa {
   const base = { ...ESTADO_INICIAL };
@@ -57,11 +75,14 @@ export default function ChatScreen() {
 
   const [estado, setEstado] = useState<EstadoConversa>(() => montarEstadoInicial(perfil));
   const [busy, setBusy] = useState(false);
+  // Sessão no servidor (bot do WhatsApp). Sem servidor configurado, começa offline.
+  const [sessionId, setSessionId] = useState(novaSessao);
+  const [offline, setOffline] = useState(!botRemotoConfigurado);
   const [inputText, setInputText] = useState('');
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
-      text: 'Olá! Sou o assistente do Direciona SUS. Estou aqui para orientar você sobre os serviços de saúde disponíveis. Como posso ajudar?',
+      text: 'Olá! Sou o assistente do Direciona.Ai. Estou aqui para orientar você sobre os serviços de saúde disponíveis. Como posso ajudar?',
       sender: 'bot',
       time: agora(),
     },
@@ -90,8 +111,20 @@ export default function ChatScreen() {
     if (!textToSend) setInputText('');
 
     try {
-      const { resultado, estado: novoEstado } = await processarTurno(text, estado);
-      setEstado(novoEstado);
+      // 1º tenta o bot do servidor; se não houver conexão, usa o motor local.
+      let resultado = offline ? null : await enviarAoBot(sessionId, text);
+      if (!resultado) {
+        if (!offline) {
+          setOffline(true);
+          setMessages((prev) => [
+            ...prev,
+            { id: String(Date.now() + 3), text: AVISO_OFFLINE, sender: 'bot', time: agora() },
+          ]);
+        }
+        const local = await processarOffline(text, estado);
+        setEstado(local.estado);
+        resultado = local.resultado;
+      }
 
       if (resultado.tipo === 'orientacao') {
         setMessages((prev) => [
@@ -133,10 +166,12 @@ export default function ChatScreen() {
   const handleReiniciar = () => {
     setFinalizado(false);
     setEstado(ESTADO_INICIAL);
+    setSessionId(novaSessao());
+    setOffline(!botRemotoConfigurado);
     setMessages([
       {
         id: '1',
-        text: 'Olá! Sou o assistente do Direciona SUS. Estou aqui para orientar você sobre os serviços de saúde disponíveis. Como posso ajudar?',
+        text: 'Olá! Sou o assistente do Direciona.Ai. Estou aqui para orientar você sobre os serviços de saúde disponíveis. Como posso ajudar?',
         sender: 'bot',
         time: agora(),
       },
@@ -182,7 +217,7 @@ export default function ChatScreen() {
               }}
             >
               <Text className="text-white font-medium text-sm leading-5">
-                {item.text}
+                {textoFormatado(item.text)}
               </Text>
             </LinearGradient>
           ) : (
@@ -191,7 +226,7 @@ export default function ChatScreen() {
                 isFinal ? 'text-emerald-700 font-semibold' : 'text-[#525bab]'
               }`}
             >
-              {item.text}
+              {textoFormatado(item.text)}
             </Text>
           )}
         </View>
@@ -221,9 +256,8 @@ export default function ChatScreen() {
             <Ionicons name="arrow-back" size={24} color="#ffffff" />
           </TouchableOpacity>
           <Text className="text-[#142e66] text-3xl font-bold font-serif">
-            Direciona Saude
+            Direciona.ai
           </Text>
-          <View className="w-8" /> {/* placeholder para alinhar central */}
         </View>
       </LinearGradient>
 
