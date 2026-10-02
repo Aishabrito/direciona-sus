@@ -4,7 +4,6 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  Image,
   StatusBar,
   KeyboardAvoidingView,
   Platform,
@@ -17,6 +16,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import Svg, { Path } from 'react-native-svg';
 import { useApp } from '../context/AppContext';
+import { Logo } from '../components/Logo';
 
 type AuthMode = 'login' | 'signup';
 
@@ -110,11 +110,9 @@ export default function LoginScreen() {
             />
           </Svg>
 
-          <Image
-            source={require('../assets/logopura.png')}
-            style={{ width: 176, height: 176, marginTop: 24 }}
-            resizeMode="contain"
-          />
+          <View style={{ marginTop: 24 }}>
+            <Logo size={150} />
+          </View>
         </LinearGradient>
 
         {/* CONTEÚDO DO FORMULÁRIO */}
