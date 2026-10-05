@@ -21,7 +21,13 @@
       "favicon": "./assets/icon.png"
     },
     "plugins": [
-      "expo-router"
+      "expo-router",
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "O Direciona.Ai usa sua localização só para mostrar as unidades de saúde mais próximas."
+        }
+      ]
     ]
   }
 }

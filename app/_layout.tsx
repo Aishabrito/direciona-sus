@@ -7,7 +7,6 @@ import {
   Nunito_700Bold,
   Nunito_800ExtraBold,
 } from '@expo-google-fonts/nunito';
-import { AppProvider } from '../context/AppContext';
 import { COR } from '../constants/tema';
 
 export default function Layout() {
@@ -22,15 +21,11 @@ export default function Layout() {
   if (!fontesProntas && !erroFontes) return null;
 
   return (
-    <AppProvider>
-      <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: COR.fundo } }}>
-        <Stack.Screen name="index" />
-        <Stack.Screen name="login" />
-        <Stack.Screen name="boas-vindas" />
-        <Stack.Screen name="localizacao" />
-        <Stack.Screen name="chat" />
-        <Stack.Screen name="direcionamento" />
-      </Stack>
-    </AppProvider>
+    <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: COR.fundo } }}>
+      <Stack.Screen name="index" />
+      <Stack.Screen name="login" />
+      <Stack.Screen name="boas-vindas" />
+      <Stack.Screen name="chat" />
+    </Stack>
   );
 }

@@ -14,7 +14,6 @@ import {
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
-import { useApp } from '../context/AppContext';
 import { Logo } from '../components/Logo';
 import { FundoBinario } from '../components/FundoBinario';
 import { COR, DEGRADE } from '../constants/tema';
@@ -24,7 +23,6 @@ type AuthMode = 'login' | 'signup';
 export default function LoginScreen() {
   const router = useRouter();
   const params = useLocalSearchParams<{ mode?: string }>();
-  const { salvarPerfil } = useApp();
 
   const [mode, setMode] = useState<AuthMode>(
     params.mode === 'signup' ? 'signup' : 'login'
@@ -39,19 +37,14 @@ export default function LoginScreen() {
   const isLogin = mode === 'login';
   const tituloBotao = isLogin ? 'Entrar Agora' : 'Criar Conta';
 
+  // Login e cadastro ainda são só visuais: não há servidor de contas, então
+  // qualquer dado leva à apresentação do app. Nunca registrar a senha em log.
   const handleSubmit = () => {
-    if (isLogin) {
-      console.log('Login:', { email, senha });
-      router.replace('/boas-vindas');
-    } else {
-      if (senha !== confirmarSenha) {
-        alert('As senhas não coincidem');
-        return;
-      }
-      console.log('Cadastro:', { nome, email, senha });
-      salvarPerfil({ idade: null, gestante: 'nao_informado' });
-      router.replace('/boas-vindas');
+    if (!isLogin && senha !== confirmarSenha) {
+      alert('As senhas não coincidem');
+      return;
     }
+    router.replace('/boas-vindas');
   };
 
   return (
@@ -205,17 +198,17 @@ export default function LoginScreen() {
             <View className="h-px flex-1 max-w-[70px] bg-slate-300" />
           </View>
 
-          {/* BOTÕES SOCIAIS */}
+          {/* BOTÕES SOCIAIS (Google e Apple ainda não implementados) */}
           <View className="flex-row justify-center gap-5 mt-3">
             <TouchableOpacity
               style={[styles.socialButton, styles.softShadow]}
-              onPress={() => console.log('Google')}
+              onPress={() => {}}
             >
               <Text className="text-slate-700 font-nunito-bold text-lg">G</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={[styles.socialButton, styles.softShadow]}
-              onPress={() => console.log('Apple')}
+              onPress={() => {}}
             >
               <Ionicons name="logo-apple" size={24} color="#1e293b" />
             </TouchableOpacity>
