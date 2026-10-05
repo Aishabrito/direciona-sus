@@ -27,6 +27,12 @@
         {
           "locationWhenInUsePermission": "O Direciona.Ai usa sua localização só para mostrar as unidades de saúde mais próximas."
         }
+      ],
+      [
+        "expo-audio",
+        {
+          "microphonePermission": "O Direciona.Ai usa o microfone para você mandar áudio contando o que está sentindo."
+        }
       ]
     ]
   }

@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -17,45 +17,51 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Location from 'expo-location';
+import {
+  useAudioRecorder,
+  useAudioRecorderState,
+  RecordingPresets,
+  requestRecordingPermissionsAsync,
+  setAudioModeAsync,
+} from 'expo-audio';
 import { Logo } from '../components/Logo';
 import { COR, DEGRADE, FONTE } from '../constants/tema';
-import { enviarAoBot, buscarUnidades, novaSessao, type OfertaLocal } from '../ia/remoto';
-import { respostaOffline, TEXTO_SEM_CONEXAO } from '../ia/offline';
+import {
+  enviarTexto, enviarAudio, enviarLocalizacao, buscarBoasVindas, novaSessao,
+  type RespostaBot,
+} from '../ia/remoto';
+import { respostaOffline, semConexao, AUDIO_SEM_CONEXAO, TEXTO_SEM_CONEXAO } from '../ia/offline';
+import { lerGravacao, tocarResposta, pararResposta } from '../ia/audio';
 
-// Chat no mesmo formato do WhatsApp: a orientação, a oferta de "unidade mais
-// próxima" e a lista de unidades aparecem como mensagens da conversa.
+// O chat é o mesmo atendimento do WhatsApp (back.direciona): texto, áudio, localização,
+// comandos ("início", "apagar") e a lista de unidades chegam como mensagens da conversa.
+// O app só desenha as mensagens, grava/toca áudio e pega a localização do celular.
 
 type Message = {
   id: string;
   text: string;
   sender: 'user' | 'bot';
   time: string;
-  isFinal?: boolean; // orientação final (texto em verde)
+  audio?: { base64: string; mime: string }; // resposta falada (quem mandou áudio)
 };
 
 const agora = () => new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 let contador = 0;
 const novoId = () => `${Date.now()}-${contador++}`;
 
-const BOAS_VINDAS =
-  'Olá! Sou o assistente do Direciona.Ai. Me conta o que você está sentindo que eu te ajudo a saber onde buscar atendimento no SUS.';
+// Usada se o servidor não responder ao abrir o chat (a original vem de /api/boas-vindas).
+const BOAS_VINDAS_RESERVA =
+  '👋 Olá! Eu sou o *Direciona.Ai*. Me conta o que você está sentindo (por *texto ou áudio* 🎤) ' +
+  'que eu te digo onde buscar atendimento no SUS. Em emergência, ligue *192*.';
 
 const SUGESTOES = [
   'Febre há 4 dias e muita fraqueza',
   'Dor no peito e falta de ar',
-  'Vacinação',
-  'Queda e bateu a cabeça',
+  'Qual a diferença entre UBS e UPA?',
+  'Onde tem uma UPA?',
 ];
 
-// Mesmo critério do WhatsApp (pareceLocal no bot.ts, simplificado): resposta curta,
-// sem pergunta e sem sintoma = bairro/cidade. Senão, a pessoa voltou a falar de saúde.
-const SINTOMA_RE = /\b(dor|falta de ar|desmaio|sangr|febre|v[oô]mito|confus|tontura|peito|respir|convuls|acidente|queimad|pior|sinto|tosse|barriga|cabe[cç]a)/i;
-function pareceEndereco(texto: string): boolean {
-  const palavras = texto.trim().split(/\s+/);
-  return palavras.length <= 7 && !texto.includes('?') && !SINTOMA_RE.test(texto);
-}
-
-// O bot usa a marcação do WhatsApp: *negrito* e _itálico_; links viram "abrir no mapa".
+// O bot usa a marcação do WhatsApp: *negrito* e _itálico_; links viram "Abrir rota no mapa".
 function textoFormatado(texto: string, corLink: string) {
   return texto.split(/(https?:\/\/\S+|\*[^*\n]+\*|_[^_\n]+_)/g).map((parte, i) => {
     if (/^https?:\/\//.test(parte)) {
@@ -73,146 +79,145 @@ function textoFormatado(texto: string, corLink: string) {
       return <Text key={i} style={{ fontFamily: FONTE.extrabold }}>{parte.slice(1, -1)}</Text>;
     }
     if (/^_[^_]+_$/.test(parte)) {
-      return <Text key={i} style={{ fontStyle: 'italic' }}>{parte.slice(1, -1)}</Text>;
+      // itálico pode ter negrito dentro (ex.: o rodapé "_...mandar *início*._")
+      return <Text key={i} style={{ fontStyle: 'italic' }}>{textoFormatado(parte.slice(1, -1), corLink)}</Text>;
     }
     return parte;
   });
 }
+
+const duracao = (ms: number) => {
+  const s = Math.floor(ms / 1000);
+  return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+};
 
 export default function ChatScreen() {
   const router = useRouter();
   const flatListRef = useRef<FlatList>(null);
 
   const [busy, setBusy] = useState(false);
-  // Uma sessão por conversa no servidor (o mesmo bot do WhatsApp).
-  const [sessionId, setSessionId] = useState(novaSessao);
+  const [sessionId] = useState(novaSessao); // uma conversa no servidor por abertura do chat
   const [inputText, setInputText] = useState('');
   const [messages, setMessages] = useState<Message[]>([
-    { id: 'inicio', text: BOAS_VINDAS, sender: 'bot', time: agora() },
+    { id: 'boas-vindas', text: BOAS_VINDAS_RESERVA, sender: 'bot', time: agora() },
   ]);
-  // Depois de uma orientação: qual unidade oferecer e se estamos esperando a localização.
-  const [oferta, setOferta] = useState<OfertaLocal | null>(null);
+  // O bot ofereceu "a UPA mais próxima" e espera a localização (vem do servidor).
   const [aguardandoLocal, setAguardandoLocal] = useState(false);
-  const [teveOrientacao, setTeveOrientacao] = useState(false);
 
-  const falar = (text: string, sender: Message['sender'], extra: Partial<Message> = {}) =>
-    setMessages((prev) => [...prev, { id: novoId(), text, sender, time: agora(), ...extra }]);
+  const gravador = useAudioRecorder(RecordingPresets.HIGH_QUALITY);
+  const estadoGravador = useAudioRecorderState(gravador, 250);
+  const [gravando, setGravando] = useState(false);
 
-  // Busca e mostra as unidades, como o executarBusca do WhatsApp.
-  const mostrarUnidades = async (onde: { lat: number; lng: number } | { endereco: string }) => {
-    if (!oferta) return;
-    falar('🔎 Buscando as unidades mais próximas, um instante...', 'bot');
-    const r = await buscarUnidades(oferta.tipo, onde);
-    if (!r) {
-      falar('❌ Não consegui buscar as unidades agora. Se for emergência, ligue *192* (SAMU).', 'bot');
-      return;
-    }
-    falar(r.texto, 'bot');
-    if (r.achouEndereco) setAguardandoLocal(false); // senão, continua esperando outro bairro
+  // Mesma apresentação que o WhatsApp manda na 1ª mensagem.
+  useEffect(() => {
+    buscarBoasVindas().then((texto) => {
+      if (texto) setMessages((prev) => prev.map((m) => (m.id === 'boas-vindas' ? { ...m, text: texto } : m)));
+    });
+    return () => pararResposta();
+  }, []);
+
+  const adicionar = (m: Omit<Message, 'id' | 'time'>) =>
+    setMessages((prev) => [...prev, { id: novoId(), time: agora(), ...m }]);
+
+  const receber = (resposta: RespostaBot) => {
+    setMessages((prev) => [
+      ...prev,
+      ...resposta.mensagens.map((m) => ({
+        id: novoId(), time: agora(), sender: 'bot' as const, text: m.texto, audio: m.audio,
+      })),
+    ]);
+    setAguardandoLocal(resposta.aguardandoLocalizacao);
   };
 
+  /** Envia texto (inclusive comandos e respostas como "sim", "não", bairro e cidade). */
   const handleSend = async (textToSend?: string) => {
     const text = (textToSend || inputText).trim();
     if (!text || busy) return;
-
     setBusy(true);
-    falar(text, 'user');
+    adicionar({ text, sender: 'user' });
     if (!textToSend) setInputText('');
-
     try {
-      // Resposta à oferta de localização: bairro e cidade digitados.
-      if (aguardandoLocal && pareceEndereco(text)) {
-        await mostrarUnidades({ endereco: text });
-        return;
-      }
-      setAguardandoLocal(false);
-
-      // Quem responde é o bot do servidor; sem conexão, só a guarda de emergência local.
-      const resultado = (await enviarAoBot(sessionId, text)) ?? respostaOffline(text);
-      const final = resultado.tipo === 'orientacao';
-      falar(resultado.texto, 'bot', { isFinal: final });
-      if (final) setTeveOrientacao(true);
-
-      if (resultado.local) {
-        setOferta(resultado.local);
-        setAguardandoLocal(true);
-        falar(
-          `📍 *Quer saber ${resultado.local.rotulo}?* Toque em *Enviar minha localização* ou escreva seu *bairro e cidade*.`,
-          'bot',
-        );
-      }
+      // Sem conexão, só a guarda de emergência local responde.
+      receber((await enviarTexto(sessionId, text)) ?? respostaOffline(text));
     } catch (error) {
       console.error('Erro no chat:', error);
-      falar(TEXTO_SEM_CONEXAO, 'bot');
+      receber(semConexao(TEXTO_SEM_CONEXAO));
     } finally {
       setBusy(false);
     }
   };
 
-  // Compartilhar a localização do celular (equivale ao 📎 → Localização do WhatsApp).
-  const enviarLocalizacao = async () => {
+  // Compartilhar a localização do celular (o 📎 → Localização do WhatsApp).
+  const handleLocalizacao = async () => {
     if (busy) return;
-    if (!oferta) {
-      falar('Primeiro me conta o que você está sentindo, que eu indico o tipo de unidade e busco a mais próxima.', 'bot');
-      return;
-    }
     setBusy(true);
     try {
       const { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== 'granted') {
-        falar('Sem permissão de localização. Você pode escrever seu *bairro e cidade* que eu busco.', 'bot');
-        setAguardandoLocal(true);
+        adicionar({ text: 'Sem permissão de localização. Você pode escrever seu *bairro e cidade* que eu busco.', sender: 'bot' });
         return;
       }
-      falar('📍 Localização enviada', 'user');
+      adicionar({ text: '📍 Localização enviada', sender: 'user' });
       const pos = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
-      await mostrarUnidades({ lat: pos.coords.latitude, lng: pos.coords.longitude });
+      const resposta = await enviarLocalizacao(sessionId, pos.coords.latitude, pos.coords.longitude);
+      receber(resposta ?? semConexao('Estou sem conexão para buscar as unidades agora. Se for emergência, ligue *192*.'));
     } catch (error) {
       console.error('Erro na localização:', error);
-      falar('Não consegui pegar sua localização. Escreva seu *bairro e cidade* que eu busco.', 'bot');
-      setAguardandoLocal(true);
+      adicionar({ text: 'Não consegui pegar sua localização. Escreva seu *bairro e cidade* que eu busco.', sender: 'bot' });
     } finally {
       setBusy(false);
     }
   };
 
-  const recusarLocalizacao = () => {
-    setAguardandoLocal(false);
-    falar('Agora não', 'user');
-    falar('Tudo bem! Se precisar, é só me chamar. 💙', 'bot');
+  // ── Áudio: toque no microfone para gravar; toque em enviar para mandar ──
+  const iniciarGravacao = async () => {
+    if (busy || gravando) return;
+    try {
+      const { granted } = await requestRecordingPermissionsAsync();
+      if (!granted) {
+        adicionar({ text: 'Sem permissão de microfone. Você pode escrever sua mensagem.', sender: 'bot' });
+        return;
+      }
+      pararResposta();
+      await setAudioModeAsync({ allowsRecording: true, playsInSilentMode: true });
+      await gravador.prepareToRecordAsync();
+      gravador.record();
+      setGravando(true);
+    } catch (error) {
+      console.error('Erro ao gravar:', error);
+      adicionar({ text: 'Não consegui usar o microfone agora. Tente escrever sua mensagem.', sender: 'bot' });
+    }
   };
 
-  const handleReiniciar = () => {
-    setSessionId(novaSessao());
-    setOferta(null);
-    setAguardandoLocal(false);
-    setTeveOrientacao(false);
-    setInputText('');
-    setMessages([{ id: novoId(), text: BOAS_VINDAS, sender: 'bot', time: agora() }]);
+  const encerrarGravacao = async (enviar: boolean) => {
+    if (!gravando) return;
+    const tempo = estadoGravador.durationMillis;
+    setGravando(false);
+    try {
+      await gravador.stop();
+      await setAudioModeAsync({ allowsRecording: false, playsInSilentMode: true }).catch(() => {});
+      if (!enviar || !gravador.uri) return;
+      if (tempo < 700) {
+        adicionar({ text: 'Áudio muito curto. Toque no microfone, fale e depois toque em enviar.', sender: 'bot' });
+        return;
+      }
+      setBusy(true);
+      adicionar({ text: `🎤 Áudio (${duracao(tempo)})`, sender: 'user' });
+      const { base64, mime } = await lerGravacao(gravador.uri);
+      receber((await enviarAudio(sessionId, base64, mime)) ?? semConexao(AUDIO_SEM_CONEXAO));
+    } catch (error) {
+      console.error('Erro ao enviar áudio:', error);
+      receber(semConexao(AUDIO_SEM_CONEXAO));
+    } finally {
+      setBusy(false);
+    }
   };
 
   const renderMessage = ({ item }: { item: Message }) => {
     const isUser = item.sender === 'user';
-
     return (
       <View className={`my-1.5 ${isUser ? 'items-end' : 'items-start'}`}>
-        <View
-          style={{
-            maxWidth: '82%',
-            padding: 16,
-            borderRadius: 18,
-            borderBottomRightRadius: isUser ? 4 : 18,
-            borderBottomLeftRadius: isUser ? 18 : 4,
-            backgroundColor: isUser ? undefined : COR.branco,
-            borderWidth: isUser ? 0 : 1,
-            borderColor: isUser ? 'transparent' : COR.borda,
-            shadowColor: COR.azul,
-            shadowOffset: { width: 0, height: 2 },
-            shadowOpacity: isUser ? 0.25 : 0.06,
-            shadowRadius: 8,
-            elevation: isUser ? 4 : 1,
-          }}
-        >
+        <View style={[styles.bolha, isUser ? styles.bolhaUser : styles.bolhaBot]}>
           {isUser ? (
             <LinearGradient
               colors={DEGRADE}
@@ -225,13 +230,21 @@ export default function ChatScreen() {
               </Text>
             </LinearGradient>
           ) : (
-            <Text
-              className={`text-[15px] leading-[22px] ${
-                item.isFinal ? 'text-[#0b7a66] font-nunito-bold' : 'text-[#034268] font-nunito'
-              }`}
-            >
-              {textoFormatado(item.text, COR.verdeEscuro)}
-            </Text>
+            <>
+              <Text className="text-[15px] leading-[22px] text-[#034268] font-nunito">
+                {textoFormatado(item.text, COR.verdeEscuro)}
+              </Text>
+              {item.audio && (
+                <TouchableOpacity
+                  style={styles.ouvir}
+                  onPress={() => tocarResposta(item.id, item.audio!.base64, item.audio!.mime)}
+                  accessibilityLabel="Ouvir a resposta"
+                >
+                  <Ionicons name="play" size={16} color={COR.branco} />
+                  <Text style={styles.ouvirTexto}>Ouvir resposta</Text>
+                </TouchableOpacity>
+              )}
+            </>
           )}
         </View>
         <Text className="text-[11px] text-slate-400 font-nunito mt-1">{item.time}</Text>
@@ -240,14 +253,18 @@ export default function ChatScreen() {
   };
 
   // Atalhos acima do campo de texto, conforme o momento da conversa.
+  const ultimaDoBot = [...messages].reverse().find((m) => m.sender === 'bot')?.text ?? '';
   const atalhos: { rotulo: string; acao: () => void; destaque?: boolean }[] = [];
   if (aguardandoLocal) {
-    atalhos.push({ rotulo: '📍 Enviar minha localização', acao: enviarLocalizacao, destaque: true });
-    atalhos.push({ rotulo: 'Agora não', acao: recusarLocalizacao });
+    atalhos.push({ rotulo: '📍 Enviar minha localização', acao: handleLocalizacao, destaque: true });
+    atalhos.push({ rotulo: 'Agora não', acao: () => handleSend('não') });
   } else if (messages.length === 1) {
     SUGESTOES.forEach((s) => atalhos.push({ rotulo: s, acao: () => handleSend(s) }));
   }
-  if (teveOrientacao) atalhos.push({ rotulo: '🔄 Nova consulta', acao: handleReiniciar });
+  // O bot fecha o atendimento com "...é só mandar início" (igual ao WhatsApp).
+  if (/mandar \*início\*/.test(ultimaDoBot)) {
+    atalhos.push({ rotulo: '🔄 Novo atendimento', acao: () => handleSend('início') });
+  }
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: COR.fundo }}>
@@ -272,13 +289,16 @@ export default function ChatScreen() {
           data={messages}
           keyExtractor={(item) => item.id}
           renderItem={renderMessage}
-          // rola para a última mensagem sempre que o conteúdo cresce (inclusive listas longas)
+          // rola para a última mensagem sempre que o conteúdo cresce
           onContentSizeChange={() => flatListRef.current?.scrollToEnd({ animated: true })}
           contentContainerStyle={{ paddingHorizontal: 20, paddingVertical: 12 }}
           style={{ flex: 1 }}
+          ListFooterComponent={
+            busy ? <Text style={styles.digitando}>Direciona.Ai está digitando…</Text> : null
+          }
         />
 
-        {atalhos.length > 0 && (
+        {atalhos.length > 0 && !gravando && (
           <View className="flex-row flex-wrap justify-center gap-2 px-4 py-2">
             {atalhos.map(({ rotulo, acao, destaque }) => (
               <TouchableOpacity
@@ -299,39 +319,68 @@ export default function ChatScreen() {
 
         <View style={styles.inputBar}>
           <View className="flex-row items-center gap-2.5">
-            {/* "+" = enviar localização (como o 📎 do WhatsApp) */}
+            {gravando ? (
+              <>
+                {/* Gravando: cancelar, tempo e enviar */}
+                <TouchableOpacity
+                  onPress={() => encerrarGravacao(false)}
+                  accessibilityLabel="Cancelar áudio"
+                  className="w-11 h-11 rounded-full bg-white items-center justify-center border border-[#dde5ec]"
+                >
+                  <Ionicons name="trash-outline" size={20} color={COR.azul} />
+                </TouchableOpacity>
+                <View style={[styles.textField, { flex: 1 }]}>
+                  <View style={styles.pontoGravando} />
+                  <Text style={styles.gravandoTexto}>
+                    Gravando {duracao(estadoGravador.durationMillis)}
+                  </Text>
+                </View>
+              </>
+            ) : (
+              <>
+                {/* 📍 = enviar localização (como o 📎 → Localização do WhatsApp) */}
+                <TouchableOpacity
+                  onPress={handleLocalizacao}
+                  disabled={busy}
+                  accessibilityLabel="Enviar minha localização"
+                  className="w-11 h-11 rounded-full bg-[#034268] items-center justify-center"
+                >
+                  <Ionicons name="location-outline" size={21} color="#ffffff" />
+                </TouchableOpacity>
+
+                {/* Campo de texto com o microfone dentro (toque para gravar um áudio) */}
+                <View style={[styles.textField, { flex: 1 }]}>
+                  <TextInput
+                    placeholder="Digite sua mensagem..."
+                    placeholderTextColor="#94a3b8"
+                    value={inputText}
+                    onChangeText={setInputText}
+                    onSubmitEditing={() => handleSend()}
+                    returnKeyType="send"
+                    editable={!busy}
+                    className="flex-1 text-sm font-nunito text-[#1d3b53]"
+                  />
+                  <TouchableOpacity onPress={iniciarGravacao} disabled={busy} accessibilityLabel="Gravar áudio">
+                    <Ionicons name="mic-outline" size={20} color={COR.azul} />
+                  </TouchableOpacity>
+                </View>
+              </>
+            )}
+
+            {/* Enviar texto, ou enviar o áudio que está sendo gravado */}
             <TouchableOpacity
-              onPress={enviarLocalizacao}
+              onPress={() => (gravando ? encerrarGravacao(true) : handleSend())}
               disabled={busy}
-              accessibilityLabel="Enviar minha localização"
-              className="w-11 h-11 rounded-full bg-[#034268] items-center justify-center"
+              accessibilityLabel={gravando ? 'Enviar áudio' : 'Enviar mensagem'}
+              style={styles.sendButtonShadow}
             >
-              <Ionicons name="location-outline" size={21} color="#ffffff" />
-            </TouchableOpacity>
-
-            {/* Campo de texto com efeito "afundado" */}
-            <View style={[styles.textField, { flex: 1 }]}>
-              <TextInput
-                placeholder={aguardandoLocal ? 'Bairro e cidade...' : 'Digite sua mensagem...'}
-                placeholderTextColor="#94a3b8"
-                value={inputText}
-                onChangeText={setInputText}
-                onSubmitEditing={() => handleSend()}
-                returnKeyType="send"
-                editable={!busy}
-                className="flex-1 text-sm font-nunito text-[#1d3b53]"
-              />
-            </View>
-
-            {/* Enviar */}
-            <TouchableOpacity onPress={() => handleSend()} disabled={busy} style={styles.sendButtonShadow}>
               <LinearGradient
                 colors={DEGRADE}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 0 }}
                 style={{ width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center' }}
               >
-                <Ionicons name="arrow-forward" size={18} color="#ffffff" />
+                <Ionicons name={gravando ? 'send' : 'arrow-forward'} size={18} color="#ffffff" />
               </LinearGradient>
             </TouchableOpacity>
           </View>
@@ -355,6 +404,39 @@ const styles = StyleSheet.create({
     borderBottomColor: COR.borda,
   },
 
+  bolha: {
+    maxWidth: '84%',
+    padding: 16,
+    borderRadius: 18,
+    shadowColor: COR.azul,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 8,
+  },
+  bolhaUser: { borderBottomRightRadius: 4, shadowOpacity: 0.25, elevation: 4 },
+  bolhaBot: {
+    borderBottomLeftRadius: 4,
+    backgroundColor: COR.branco,
+    borderWidth: 1,
+    borderColor: COR.borda,
+    shadowOpacity: 0.06,
+    elevation: 1,
+  },
+
+  ouvir: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'flex-start',
+    gap: 6,
+    marginTop: 12,
+    paddingVertical: 8,
+    paddingHorizontal: 14,
+    borderRadius: 20,
+    backgroundColor: COR.verde,
+  },
+  ouvirTexto: { color: COR.branco, fontFamily: FONTE.extrabold, fontSize: 13 },
+
+  digitando: { fontFamily: FONTE.regular, fontStyle: 'italic', color: COR.textoSuave, fontSize: 13, marginTop: 6 },
+
   inputBar: {
     backgroundColor: 'rgba(240,244,248,0.8)',
     paddingHorizontal: 16,
@@ -374,6 +456,7 @@ const styles = StyleSheet.create({
     borderRadius: 22,
     backgroundColor: '#edf1f7',
     paddingHorizontal: 16,
+    gap: 8,
     borderTopWidth: 1.5,
     borderLeftWidth: 1.5,
     borderTopColor: 'rgba(160,172,194,0.45)',
@@ -387,6 +470,9 @@ const styles = StyleSheet.create({
       android: { elevation: 1 },
     }),
   },
+
+  pontoGravando: { width: 10, height: 10, borderRadius: 5, backgroundColor: '#e5484d' },
+  gravandoTexto: { fontFamily: FONTE.bold, color: COR.azul, fontSize: 14 },
 
   sendButtonShadow: Platform.select({
     ios: {

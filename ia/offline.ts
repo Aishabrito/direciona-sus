@@ -9,10 +9,18 @@ export const TEXTO_SEM_CONEXAO =
   'Tente de novo em instantes. Se for urgente, procure uma UPA. Em emergência ' +
   '(falta de ar, dor no peito, desmaio, confusão ou sangramento importante), ligue *192 (SAMU)*.';
 
+export const AUDIO_SEM_CONEXAO =
+  '🎤 Estou sem conexão com o servidor e não consigo ouvir o áudio agora. Tente de novo em ' +
+  'instantes ou escreva. Em emergência, ligue *192 (SAMU)*.';
+
+/** Resposta com uma única mensagem de texto. */
+export function semConexao(texto: string): RespostaBot {
+  return { mensagens: [{ texto }], aguardandoLocalizacao: false };
+}
+
+/** Resposta a um texto quando não há conexão. */
 export function respostaOffline(texto: string): RespostaBot {
   const guarda = detectarCriticoRegex(texto);
-  if (guarda.critico) {
-    return { tipo: 'orientacao', texto: textoEmergencia(guarda.categoria, guarda.terceiro) };
-  }
-  return { tipo: 'perguntas', texto: TEXTO_SEM_CONEXAO };
+  if (guarda.critico) return semConexao(textoEmergencia(guarda.categoria, guarda.terceiro));
+  return semConexao(TEXTO_SEM_CONEXAO);
 }
