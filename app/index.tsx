@@ -1,11 +1,11 @@
 import { useEffect } from 'react';
-import { View, StatusBar, StyleSheet } from 'react-native';
+import { View, Text, StatusBar, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
-import { LinearGradient } from 'expo-linear-gradient';
 import { Logo } from '../components/Logo';
-import { Waves } from '../components/Waves';
+import { FundoBinario } from '../components/FundoBinario';
+import { COR, FONTE } from '../constants/tema';
 
-// Tela de abertura (Figma: "Tela inicial").
+// Tela de abertura, no estilo dos posts: fundo claro com binários, logo e a frase.
 export default function Index() {
   const router = useRouter();
 
@@ -15,26 +15,26 @@ export default function Index() {
   }, []);
 
   return (
-    <LinearGradient
-      colors={['#142e66', '#3380b2', '#59d9d1']}
-      locations={[0, 0.45, 1]}
-      style={styles.container}
-    >
-      <StatusBar barStyle="light-content" />
-      <Waves height={220} />
-      <Logo size={190} />
-      <View style={styles.dots}>
-        <View style={[styles.dot, styles.dotAtivo]} />
-        <View style={styles.dot} />
-        <View style={styles.dot} />
-      </View>
-    </LinearGradient>
+    <View style={styles.container}>
+      <StatusBar barStyle="dark-content" />
+      <FundoBinario />
+      <Logo largura={250} />
+      <Text style={styles.frase}>
+        Inteligência Artificial e informação para facilitar o seu acesso à saúde pública.
+      </Text>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-  dots: { position: 'absolute', bottom: 48, flexDirection: 'row', gap: 6 },
-  dot: { width: 6, height: 6, borderRadius: 3, backgroundColor: 'rgba(255,255,255,0.45)' },
-  dotAtivo: { backgroundColor: '#ffffff' },
+  container: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 32 },
+  frase: {
+    fontFamily: FONTE.serif,
+    fontWeight: '700',
+    fontSize: 20,
+    lineHeight: 28,
+    color: COR.azul,
+    textAlign: 'center',
+    marginTop: 40,
+  },
 });

@@ -15,6 +15,8 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
+import { Logo } from '../components/Logo';
+import { COR, DEGRADE } from '../constants/tema';
 import { enviarAoBot, novaSessao } from '../ia/remoto';
 import { respostaOffline, TEXTO_SEM_CONEXAO } from '../ia/offline';
 
@@ -146,8 +148,8 @@ export default function ChatScreen() {
               ? undefined
               : '#ffffff',
             borderWidth: isUser ? 0 : 1,
-            borderColor: isUser ? 'transparent' : '#e2eaf4',
-            shadowColor: '#142e66',
+            borderColor: isUser ? 'transparent' : '#dde5ec',
+            shadowColor: COR.azul,
             shadowOffset: { width: 0, height: 2 },
             shadowOpacity: isUser ? 0.25 : 0.06,
             shadowRadius: 8,
@@ -156,7 +158,7 @@ export default function ChatScreen() {
         >
           {isUser ? (
             <LinearGradient
-              colors={['#142e66', '#3380b2', '#3ea8c0']}
+              colors={DEGRADE}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 0 }}
               style={{
@@ -166,21 +168,21 @@ export default function ChatScreen() {
                 margin: -16,
               }}
             >
-              <Text className="text-white font-medium text-sm leading-5">
+              <Text className="text-white font-nunito text-[15px] leading-[22px]">
                 {textoFormatado(item.text)}
               </Text>
             </LinearGradient>
           ) : (
             <Text
-              className={`text-sm leading-5 ${
-                isFinal ? 'text-emerald-700 font-semibold' : 'text-[#525bab]'
+              className={`text-[15px] leading-[22px] ${
+                isFinal ? 'text-[#0b7a66] font-nunito-bold' : 'text-[#034268]'
               }`}
             >
               {textoFormatado(item.text)}
             </Text>
           )}
         </View>
-        <Text className="text-[11px] text-slate-400 font-medium mt-1">
+        <Text className="text-[11px] text-slate-400 font-nunito mt-1">
           {item.time}
         </Text>
       </View>
@@ -188,28 +190,17 @@ export default function ChatScreen() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-[#f0f4f8]">
-      <StatusBar barStyle="light-content" />
+    <SafeAreaView className="flex-1 bg-[#f7f9fb]">
+      <StatusBar barStyle="dark-content" />
 
-      {/* Header com gradiente */}
-      <LinearGradient
-        colors={['#142e66', '#3380b2', '#59d9d1']}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-        style={{ paddingTop: 8, paddingBottom: 12 }}
-      >
-        <View className="flex-row items-center justify-between px-5">
-          <TouchableOpacity
-            onPress={() => router.back()}
-            className="p-1"
-          >
-            <Ionicons name="arrow-back" size={24} color="#ffffff" />
-          </TouchableOpacity>
-          <Text className="text-[#142e66] text-3xl font-bold font-serif">
-            Direciona.ai
-          </Text>
-        </View>
-      </LinearGradient>
+      {/* Cabeçalho claro com o logo */}
+      <View style={styles.cabecalho}>
+        <TouchableOpacity onPress={() => router.back()} className="p-1">
+          <Ionicons name="arrow-back" size={24} color={COR.azul} />
+        </TouchableOpacity>
+        <Logo largura={128} />
+        <View style={{ width: 32 }} />
+      </View>
 
       {/* Área de mensagens */}
       <KeyboardAvoidingView
@@ -234,9 +225,9 @@ export default function ChatScreen() {
                 <TouchableOpacity
                   key={item}
                   onPress={() => handleSend(item)}
-                  className="bg-white px-4 py-2 rounded-full border border-[#e2eaf4] shadow-sm"
+                  className="bg-white px-4 py-2 rounded-full border border-[#dde5ec] shadow-sm"
                 >
-                  <Text className="text-[#525bab] font-medium text-xs">{item}</Text>
+                  <Text className="text-[#034268] font-nunito text-xs">{item}</Text>
                 </TouchableOpacity>
               ))}
             </View>
@@ -245,7 +236,7 @@ export default function ChatScreen() {
               <View className="flex-row items-center gap-2.5">
                 {/* Botão "+" escuro (apenas visual) */}
                 <TouchableOpacity
-                  className="w-11 h-11 rounded-full bg-[#142e66] items-center justify-center"
+                  className="w-11 h-11 rounded-full bg-[#034268] items-center justify-center"
                   disabled
                 >
                   <Ionicons name="add" size={22} color="#ffffff" />
@@ -259,7 +250,7 @@ export default function ChatScreen() {
                     value={inputText}
                     onChangeText={setInputText}
                     editable={!busy}
-                    className="flex-1 text-sm font-medium text-slate-400"
+                    className="flex-1 text-sm font-nunito text-slate-400"
                   />
                   <Ionicons name="mic-outline" size={18} color="#94a3b8" />
                 </View>
@@ -271,7 +262,7 @@ export default function ChatScreen() {
                   style={styles.sendButtonShadow}
                 >
                   <LinearGradient
-                    colors={['#142e66', '#3380b2', '#3ea8c0']}
+                    colors={DEGRADE}
                     start={{ x: 0, y: 0 }}
                     end={{ x: 1, y: 0 }}
                     style={{
@@ -290,12 +281,12 @@ export default function ChatScreen() {
           </>
         ) : (
           // Tela finalizada – botão de reiniciar
-          <View className="p-4 bg-[#f0f4f8] items-center">
+          <View className="p-4 bg-[#f7f9fb] items-center">
             <TouchableOpacity
               onPress={handleReiniciar}
-              className="bg-white px-8 py-3 rounded-full border border-[#e2eaf4] shadow-sm"
+              className="bg-white px-8 py-3 rounded-full border border-[#dde5ec] shadow-sm"
             >
-              <Text className="text-[#525bab] font-bold text-sm tracking-wider">
+              <Text className="text-[#034268] font-nunito-bold text-sm tracking-wider">
                 🔄 Nova consulta
               </Text>
             </TouchableOpacity>
@@ -309,6 +300,17 @@ export default function ChatScreen() {
 // Sombras via StyleSheet nativo (funciona igual em iOS/Android — classes arbitrárias
 // tipo shadow-[inset_...] não renderizam de fato no React Native)
 const styles = StyleSheet.create({
+  cabecalho: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    backgroundColor: COR.branco,
+    borderBottomWidth: 1,
+    borderBottomColor: COR.borda,
+  },
+
   inputBar: {
     backgroundColor: 'rgba(240,244,248,0.8)',
     paddingHorizontal: 16,
@@ -362,7 +364,7 @@ const styles = StyleSheet.create({
       width: 44,
       height: 44,
       borderRadius: 22,
-      shadowColor: '#142e66',
+      shadowColor: COR.azul,
       shadowOffset: { width: 0, height: 4 },
       shadowOpacity: 0.31,
       shadowRadius: 10,

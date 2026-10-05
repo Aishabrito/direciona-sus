@@ -1,29 +1,25 @@
-import { View, Text, Image, StyleSheet } from 'react-native';
+import { Image } from 'react-native';
 
 type Props = {
-  size?: number;
-  /** cor do "Direciona"; o ".Ai" fica sempre em verde-água */
-  color?: string;
+  /** largura em pontos */
+  largura?: number;
+  /** 'completo' = D + "Direciona.Ai"; 'icone' = só o D */
+  tipo?: 'completo' | 'icone';
 };
 
-// Logo do Figma: o "D" com a bússola e o nome "Direciona.Ai" logo abaixo.
-export function Logo({ size = 150, color = '#142e66' }: Props) {
+const ARQUIVOS = {
+  completo: { fonte: require('../assets/logo-direciona-ai.png'), proporcao: 658 / 993 },
+  icone: { fonte: require('../assets/logo-icone.png'), proporcao: 473 / 479 },
+};
+
+export function Logo({ largura = 220, tipo = 'completo' }: Props) {
+  const { fonte, proporcao } = ARQUIVOS[tipo];
   return (
-    <View style={styles.container}>
-      <Image
-        source={require('../assets/logopura.png')}
-        style={{ width: size * 1.15, height: size * 1.15 * (353 / 482) }}
-        resizeMode="contain"
-      />
-      <Text style={[styles.nome, { fontSize: size * 0.21, color }]}>
-        Direciona<Text style={styles.ai}>.Ai</Text>
-      </Text>
-    </View>
+    <Image
+      source={fonte}
+      style={{ width: largura, height: largura * proporcao }}
+      resizeMode="contain"
+      accessibilityLabel="Direciona.Ai"
+    />
   );
 }
-
-const styles = StyleSheet.create({
-  container: { alignItems: 'center' },
-  nome: { fontWeight: '800', marginTop: 4, letterSpacing: 0.3 },
-  ai: { color: '#0e9488' },
-});

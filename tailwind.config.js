@@ -6,7 +6,13 @@ module.exports = {
   ],
   presets: [require('nativewind/preset')],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        nunito: ['Nunito_600SemiBold'],
+        'nunito-regular': ['Nunito_400Regular'],
+        'nunito-bold': ['Nunito_800ExtraBold'],
+      },
+    },
   },
   plugins: [],
 };

@@ -6,7 +6,6 @@ import {
   ScrollView,
   StatusBar,
   StyleSheet,
-  Platform,
   useWindowDimensions,
   NativeSyntheticEvent,
   NativeScrollEvent,
@@ -19,6 +18,9 @@ import {
   TriagemIllustration,
   DirecionamentoIllustration,
 } from '../components/OnboardingIllustrations';
+import { FundoBinario } from '../components/FundoBinario';
+import { Logo } from '../components/Logo';
+import { COR, DEGRADE, FONTE } from '../constants/tema';
 
 // Telas de apresentação do app (Figma: onboarding em 3 passos).
 const PAGINAS = [
@@ -42,8 +44,6 @@ const PAGINAS = [
   },
 ];
 
-const SERIF = Platform.select({ ios: 'Georgia', android: 'serif', default: 'Georgia, serif' });
-
 export default function OnboardingScreen() {
   const router = useRouter();
   const { width } = useWindowDimensions();
@@ -66,14 +66,13 @@ export default function OnboardingScreen() {
   };
 
   return (
-    <LinearGradient
-      colors={['#142e66', '#2a6a9f', '#59d9d1']}
-      locations={[0, 0.5, 1]}
-      style={styles.container}
-    >
-      <StatusBar barStyle="light-content" />
+    <View style={styles.container}>
+      <StatusBar barStyle="dark-content" />
+      <FundoBinario />
       <SafeAreaView style={styles.container}>
-        <Text style={styles.marca}>Direciona ai</Text>
+        <View style={styles.marca}>
+          <Logo largura={120} />
+        </View>
 
         <ScrollView
           ref={scrollRef}
@@ -86,7 +85,7 @@ export default function OnboardingScreen() {
         >
           {PAGINAS.map(({ titulo, texto, Ilustracao }) => (
             <View key={titulo} style={[styles.pagina, { width }]}>
-              <LinearGradient colors={['#e3f8f8', '#a9e3e8']} style={styles.cartao}>
+              <LinearGradient colors={['#ffffff', '#dcf4ee']} style={styles.cartao}>
                 <Ilustracao />
               </LinearGradient>
               <Text style={styles.titulo}>{titulo}</Text>
@@ -101,40 +100,37 @@ export default function OnboardingScreen() {
               <View key={p.titulo} style={[styles.dot, i === pagina && styles.dotAtivo]} />
             ))}
           </View>
-          <TouchableOpacity style={styles.botao} onPress={avancar} activeOpacity={0.8}>
-            <Text style={styles.botaoTexto}>{ultima ? 'Começar a usar' : 'Próximo'}</Text>
+          <TouchableOpacity onPress={avancar} activeOpacity={0.8} style={styles.botaoSombra}>
+            <LinearGradient colors={DEGRADE} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={styles.botao}>
+              <Text style={styles.botaoTexto}>{ultima ? 'Começar a usar' : 'Próximo'}</Text>
+            </LinearGradient>
           </TouchableOpacity>
         </View>
       </SafeAreaView>
-    </LinearGradient>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  marca: {
-    fontFamily: SERIF,
-    color: 'rgba(255,255,255,0.9)',
-    fontSize: 16,
-    paddingHorizontal: 24,
-    paddingTop: 12,
-  },
+  marca: { paddingHorizontal: 24, paddingTop: 12, alignItems: 'flex-start' },
   pagina: { flex: 1, paddingHorizontal: 24, justifyContent: 'center' },
   cartao: {
     height: 240,
     borderRadius: 24,
     overflow: 'hidden',
     marginBottom: 32,
+    borderWidth: 1,
+    borderColor: COR.borda,
   },
   titulo: {
-    fontFamily: SERIF,
-    fontWeight: '700',
-    color: '#ffffff',
-    fontSize: 27,
-    lineHeight: 33,
+    fontFamily: FONTE.extrabold,
+    color: COR.azul,
+    fontSize: 28,
+    lineHeight: 34,
     marginBottom: 12,
   },
-  texto: { color: 'rgba(255,255,255,0.88)', fontSize: 15, lineHeight: 22 },
+  texto: { fontFamily: FONTE.regular, color: COR.textoSuave, fontSize: 16, lineHeight: 24 },
   rodape: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -144,15 +140,16 @@ const styles = StyleSheet.create({
     paddingTop: 12,
   },
   dots: { flexDirection: 'row', gap: 6 },
-  dot: { width: 6, height: 6, borderRadius: 3, backgroundColor: 'rgba(255,255,255,0.5)' },
-  dotAtivo: { width: 22, backgroundColor: '#ffffff' },
-  botao: {
-    backgroundColor: '#1d4a6b',
-    borderRadius: 24,
-    paddingVertical: 13,
-    paddingHorizontal: 26,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.25)',
+  dot: { width: 7, height: 7, borderRadius: 4, backgroundColor: COR.borda },
+  dotAtivo: { width: 24, backgroundColor: COR.verde },
+  botaoSombra: {
+    borderRadius: 26,
+    shadowColor: COR.azul,
+    shadowOpacity: 0.25,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 5 },
+    elevation: 5,
   },
-  botaoTexto: { color: '#ffffff', fontWeight: '700', fontSize: 15 },
+  botao: { borderRadius: 26, paddingVertical: 14, paddingHorizontal: 28 },
+  botaoTexto: { fontFamily: FONTE.extrabold, color: COR.branco, fontSize: 16 },
 });

@@ -14,9 +14,10 @@ import {
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
-import Svg, { Path } from 'react-native-svg';
 import { useApp } from '../context/AppContext';
 import { Logo } from '../components/Logo';
+import { FundoBinario } from '../components/FundoBinario';
+import { COR, DEGRADE } from '../constants/tema';
 
 type AuthMode = 'login' | 'signup';
 
@@ -55,65 +56,19 @@ export default function LoginScreen() {
 
   return (
     <KeyboardAvoidingView
-      style={{ flex: 1, backgroundColor: '#f0f4f8' }}
+      style={{ flex: 1, backgroundColor: COR.fundo }}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
-      <StatusBar barStyle="light-content" />
+      <StatusBar barStyle="dark-content" />
+      <FundoBinario />
       <ScrollView
         contentContainerStyle={{ flexGrow: 1 }}
         keyboardShouldPersistTaps="handled"
       >
-        {/* HEADER COM GRADIENTE + ONDAS */}
-        <LinearGradient
-          colors={['#142e66', '#3380b2', '#59d9d1']}
-          style={{
-            height: 280,
-            justifyContent: 'center',
-            alignItems: 'center',
-            paddingTop: 40,
-            overflow: 'hidden',
-          }}
-        >
-          <Svg
-            width="100%"
-            height="140"
-            viewBox="0 0 400 140"
-            style={{ position: 'absolute', bottom: 0, left: 0 }}
-          >
-            <Path
-              d="M0 90 Q 100 60, 200 88 T 400 82"
-              fill="none"
-              stroke="#ffffff"
-              strokeWidth={1.5}
-              opacity={0.35}
-            />
-            <Path
-              d="M0 100 Q 100 75, 200 98 T 400 92"
-              fill="none"
-              stroke="#ffffff"
-              strokeWidth={1.5}
-              opacity={0.25}
-            />
-            <Path
-              d="M0 110 Q 100 92, 200 106 T 400 100"
-              fill="none"
-              stroke="#ffffff"
-              strokeWidth={1.5}
-              opacity={0.18}
-            />
-            <Path
-              d="M0 120 Q 100 105, 200 115 T 400 110"
-              fill="none"
-              stroke="#ffffff"
-              strokeWidth={1.5}
-              opacity={0.12}
-            />
-          </Svg>
-
-          <View style={{ marginTop: 24 }}>
-            <Logo size={150} />
-          </View>
-        </LinearGradient>
+        {/* CABEÇALHO CLARO COM O LOGO (estilo dos posts) */}
+        <View style={styles.cabecalho}>
+          <Logo largura={220} />
+        </View>
 
         {/* CONTEÚDO DO FORMULÁRIO */}
         <View className="flex-1 px-7 pt-6 pb-5">
@@ -131,17 +86,17 @@ export default function LoginScreen() {
                 >
                   {ativo ? (
                     <LinearGradient
-                      colors={['#142e66', '#3380b2']}
+                      colors={[COR.azul, COR.verde]}
                       start={{ x: 0, y: 0 }}
                       end={{ x: 1, y: 0 }}
                       style={[styles.switcherActive, styles.softShadow]}
                     >
-                      <Text className="text-white font-bold text-sm">
+                      <Text className="text-white font-nunito-bold text-sm">
                         {modo === 'login' ? 'Entrar' : 'Cadastrar'}
                       </Text>
                     </LinearGradient>
                   ) : (
-                    <Text className="text-slate-500 font-semibold text-sm">
+                    <Text className="text-slate-500 font-nunito text-sm">
                       {modo === 'login' ? 'Entrar' : 'Cadastrar'}
                     </Text>
                   )}
@@ -156,7 +111,7 @@ export default function LoginScreen() {
               <View style={styles.inputField}>
                 <Ionicons name="person-outline" size={20} color="#64748b" />
                 <TextInput
-                  className="flex-1 ml-3 text-slate-600 font-medium text-[15px]"
+                  className="flex-1 ml-3 text-slate-600 font-nunito text-[15px]"
                   placeholder="Nome completo"
                   placeholderTextColor="#94a3b8"
                   value={nome}
@@ -169,7 +124,7 @@ export default function LoginScreen() {
             <View style={styles.inputField}>
               <Ionicons name="mail-outline" size={20} color="#64748b" />
               <TextInput
-                className="flex-1 ml-3 text-slate-600 font-medium text-[15px]"
+                className="flex-1 ml-3 text-slate-600 font-nunito text-[15px]"
                 placeholder="Seu e-mail"
                 placeholderTextColor="#94a3b8"
                 value={email}
@@ -182,7 +137,7 @@ export default function LoginScreen() {
             <View style={styles.inputField}>
               <Ionicons name="lock-closed-outline" size={20} color="#64748b" />
               <TextInput
-                className="flex-1 ml-3 text-slate-600 font-medium text-[15px]"
+                className="flex-1 ml-3 text-slate-600 font-nunito text-[15px]"
                 placeholder="Sua senha"
                 placeholderTextColor="#94a3b8"
                 value={senha}
@@ -203,7 +158,7 @@ export default function LoginScreen() {
               <View style={styles.inputField}>
                 <Ionicons name="lock-closed-outline" size={20} color="#64748b" />
                 <TextInput
-                  className="flex-1 ml-3 text-slate-600 font-medium text-[15px]"
+                  className="flex-1 ml-3 text-slate-600 font-nunito text-[15px]"
                   placeholder="Confirmar senha"
                   placeholderTextColor="#94a3b8"
                   value={confirmarSenha}
@@ -217,7 +172,7 @@ export default function LoginScreen() {
 
           {isLogin && (
             <TouchableOpacity className="self-end mt-1.5" onPress={() => {}}>
-              <Text className="text-[#3380b2] font-semibold text-[13px]">
+              <Text className="text-[#0e9a80] font-nunito text-[13px]">
                 Esqueceu a senha?
               </Text>
             </TouchableOpacity>
@@ -230,12 +185,12 @@ export default function LoginScreen() {
             activeOpacity={0.8}
           >
             <LinearGradient
-              colors={['#142e66', '#3380b2', '#3ea8c0']}
+              colors={DEGRADE}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 0 }}
               style={styles.mainButtonGradient}
             >
-              <Text className="text-white font-bold text-base tracking-widest">
+              <Text className="text-white font-nunito-bold text-base tracking-widest">
                 {tituloBotao}
               </Text>
             </LinearGradient>
@@ -244,7 +199,7 @@ export default function LoginScreen() {
           {/* DIVISOR */}
           <View className="flex-row items-center justify-center gap-3.5 mt-6">
             <View className="h-px flex-1 max-w-[70px] bg-slate-300" />
-            <Text className="text-slate-400 font-medium text-xs">
+            <Text className="text-slate-400 font-nunito text-xs">
               {isLogin ? 'Ou entrar com:' : 'Ou cadastrar com:'}
             </Text>
             <View className="h-px flex-1 max-w-[70px] bg-slate-300" />
@@ -256,7 +211,7 @@ export default function LoginScreen() {
               style={[styles.socialButton, styles.softShadow]}
               onPress={() => console.log('Google')}
             >
-              <Text className="text-slate-700 font-bold text-lg">G</Text>
+              <Text className="text-slate-700 font-nunito-bold text-lg">G</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={[styles.socialButton, styles.softShadow]}
@@ -271,9 +226,9 @@ export default function LoginScreen() {
             className="mt-4 items-center py-2"
             onPress={() => setMode(isLogin ? 'signup' : 'login')}
           >
-            <Text className="text-slate-500 text-sm font-medium">
+            <Text className="text-slate-500 text-sm font-nunito">
               {isLogin ? 'Não tem uma conta? ' : 'Já tem uma conta? '}
-              <Text className="text-[#3380b2] font-bold underline">
+              <Text className="text-[#0e9a80] font-nunito-bold underline">
                 {isLogin ? 'Cadastre-se' : 'Faça login'}
               </Text>
             </Text>
@@ -293,6 +248,14 @@ export default function LoginScreen() {
 // Sombras e efeito "afundado" via StyleSheet nativo (funciona igual em iOS/Android,
 // diferente de classes arbitrárias tailwind tipo shadow-[inset_...] que não renderizam em RN)
 const styles = StyleSheet.create({
+  cabecalho: {
+    height: 250,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingTop: 30,
+    overflow: 'hidden',
+  },
+
   // Campos de input: simula profundidade com bordas bicolor
   // (mais escura em cima/esquerda = "sombra entrando", mais clara embaixo/direita = "brilho saindo")
   inputField: {
@@ -360,7 +323,7 @@ const styles = StyleSheet.create({
   },
   mainButtonShadow: Platform.select({
     ios: {
-      shadowColor: '#142e66',
+      shadowColor: COR.azul,
       shadowOffset: { width: 0, height: 8 },
       shadowOpacity: 0.31,
       shadowRadius: 12,
