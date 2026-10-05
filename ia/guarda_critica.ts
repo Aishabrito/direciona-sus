@@ -1,4 +1,7 @@
-// src/ia/guarda_critica.ts
+// Cópia de back.direciona/src/ia/guarda_critica.ts, usada pelo app quando não há
+// conexão com o servidor (ia/offline.ts). Ao mudar as regras de emergência no back,
+// copie este arquivo de novo.
+//
 // Guarda de segurança que roda ANTES do LLM. Redundância intencional:
 // se o LLM falhar em ver o óbvio, a guarda pega.
 //

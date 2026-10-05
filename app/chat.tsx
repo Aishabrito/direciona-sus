@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -11,33 +11,66 @@ import {
   StatusBar,
   StyleSheet,
   ViewStyle,
+  Linking,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
-import { ESTADO_INICIAL, type EstadoConversa } from '../ia';
-import { useApp } from '../context/AppContext';
-import { enviarAoBot, novaSessao, botRemotoConfigurado } from '../ia/remoto';
-import { processarOffline } from '../ia/offline';
+import * as Location from 'expo-location';
+import { Logo } from '../components/Logo';
+import { COR, DEGRADE, FONTE } from '../constants/tema';
+import { enviarAoBot, buscarUnidades, novaSessao, type OfertaLocal } from '../ia/remoto';
+import { respostaOffline, TEXTO_SEM_CONEXAO } from '../ia/offline';
+
+// Chat no mesmo formato do WhatsApp: a orientação, a oferta de "unidade mais
+// próxima" e a lista de unidades aparecem como mensagens da conversa.
 
 type Message = {
   id: string;
   text: string;
   sender: 'user' | 'bot';
   time: string;
-  isFinal?: boolean;
+  isFinal?: boolean; // orientação final (texto em verde)
 };
 
 const agora = () => new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+let contador = 0;
+const novoId = () => `${Date.now()}-${contador++}`;
 
-const AVISO_OFFLINE =
-  'Sem conexão com o servidor. Sigo com a orientação no modo offline do aplicativo.';
+const BOAS_VINDAS =
+  'Olá! Sou o assistente do Direciona.Ai. Me conta o que você está sentindo que eu te ajudo a saber onde buscar atendimento no SUS.';
 
-// O bot usa a marcação do WhatsApp: *negrito* e _itálico_.
-function textoFormatado(texto: string) {
-  return texto.split(/(\*[^*\n]+\*|_[^_\n]+_)/g).map((parte, i) => {
+const SUGESTOES = [
+  'Febre há 4 dias e muita fraqueza',
+  'Dor no peito e falta de ar',
+  'Vacinação',
+  'Queda e bateu a cabeça',
+];
+
+// Mesmo critério do WhatsApp (pareceLocal no bot.ts, simplificado): resposta curta,
+// sem pergunta e sem sintoma = bairro/cidade. Senão, a pessoa voltou a falar de saúde.
+const SINTOMA_RE = /\b(dor|falta de ar|desmaio|sangr|febre|v[oô]mito|confus|tontura|peito|respir|convuls|acidente|queimad|pior|sinto|tosse|barriga|cabe[cç]a)/i;
+function pareceEndereco(texto: string): boolean {
+  const palavras = texto.trim().split(/\s+/);
+  return palavras.length <= 7 && !texto.includes('?') && !SINTOMA_RE.test(texto);
+}
+
+// O bot usa a marcação do WhatsApp: *negrito* e _itálico_; links viram "abrir no mapa".
+function textoFormatado(texto: string, corLink: string) {
+  return texto.split(/(https?:\/\/\S+|\*[^*\n]+\*|_[^_\n]+_)/g).map((parte, i) => {
+    if (/^https?:\/\//.test(parte)) {
+      return (
+        <Text
+          key={i}
+          style={{ color: corLink, fontFamily: FONTE.extrabold, textDecorationLine: 'underline' }}
+          onPress={() => Linking.openURL(parte)}
+        >
+          Abrir rota no mapa
+        </Text>
+      );
+    }
     if (/^\*[^*]+\*$/.test(parte)) {
-      return <Text key={i} style={{ fontWeight: '700' }}>{parte.slice(1, -1)}</Text>;
+      return <Text key={i} style={{ fontFamily: FONTE.extrabold }}>{parte.slice(1, -1)}</Text>;
     }
     if (/^_[^_]+_$/.test(parte)) {
       return <Text key={i} style={{ fontStyle: 'italic' }}>{parte.slice(1, -1)}</Text>;
@@ -46,158 +79,134 @@ function textoFormatado(texto: string) {
   });
 }
 
-function montarEstadoInicial(perfil: any): EstadoConversa {
-  const base = { ...ESTADO_INICIAL };
-  if (perfil.idade) {
-    let idade_grupo: 'bebe' | 'crianca' | 'adolescente' | 'adulto' | 'idoso' | 'nao_informado' = 'nao_informado';
-    if (perfil.idade < 2) idade_grupo = 'bebe';
-    else if (perfil.idade < 12) idade_grupo = 'crianca';
-    else if (perfil.idade < 18) idade_grupo = 'adolescente';
-    else if (perfil.idade < 60) idade_grupo = 'adulto';
-    else idade_grupo = 'idoso';
-
-    if (base.relatos.length > 0) {
-      base.relatos[0] = {
-        ...base.relatos[0],
-        idade_grupo,
-        gestante: perfil.gestante || 'nao_informado',
-      };
-    }
-  }
-  return base;
-}
-
 export default function ChatScreen() {
   const router = useRouter();
-  const { perfil } = useApp();
   const flatListRef = useRef<FlatList>(null);
-  const [finalizado, setFinalizado] = useState(false);
 
-  const [estado, setEstado] = useState<EstadoConversa>(() => montarEstadoInicial(perfil));
   const [busy, setBusy] = useState(false);
-  // Sessão no servidor (bot do WhatsApp). Sem servidor configurado, começa offline.
+  // Uma sessão por conversa no servidor (o mesmo bot do WhatsApp).
   const [sessionId, setSessionId] = useState(novaSessao);
-  const [offline, setOffline] = useState(!botRemotoConfigurado);
   const [inputText, setInputText] = useState('');
   const [messages, setMessages] = useState<Message[]>([
-    {
-      id: '1',
-      text: 'Olá! Sou o assistente do Direciona.Ai. Estou aqui para orientar você sobre os serviços de saúde disponíveis. Como posso ajudar?',
-      sender: 'bot',
-      time: agora(),
-    },
+    { id: 'inicio', text: BOAS_VINDAS, sender: 'bot', time: agora() },
   ]);
+  // Depois de uma orientação: qual unidade oferecer e se estamos esperando a localização.
+  const [oferta, setOferta] = useState<OfertaLocal | null>(null);
+  const [aguardandoLocal, setAguardandoLocal] = useState(false);
+  const [teveOrientacao, setTeveOrientacao] = useState(false);
 
-  useEffect(() => {
-    if (messages.length > 0) {
-      flatListRef.current?.scrollToEnd({ animated: true });
+  const falar = (text: string, sender: Message['sender'], extra: Partial<Message> = {}) =>
+    setMessages((prev) => [...prev, { id: novoId(), text, sender, time: agora(), ...extra }]);
+
+  // Busca e mostra as unidades, como o executarBusca do WhatsApp.
+  const mostrarUnidades = async (onde: { lat: number; lng: number } | { endereco: string }) => {
+    if (!oferta) return;
+    falar('🔎 Buscando as unidades mais próximas, um instante...', 'bot');
+    const r = await buscarUnidades(oferta.tipo, onde);
+    if (!r) {
+      falar('❌ Não consegui buscar as unidades agora. Se for emergência, ligue *192* (SAMU).', 'bot');
+      return;
     }
-  }, [messages]);
-
-  const suggestions = [
-    'Febre há 4 dias e muita fraqueza',
-    'Dor no peito e falta de ar',
-    'Vacinação',
-    'Queda e bateu a cabeça',
-  ];
+    falar(r.texto, 'bot');
+    if (r.achouEndereco) setAguardandoLocal(false); // senão, continua esperando outro bairro
+  };
 
   const handleSend = async (textToSend?: string) => {
-    if (finalizado) return;
     const text = (textToSend || inputText).trim();
     if (!text || busy) return;
 
     setBusy(true);
-    setMessages((prev) => [...prev, { id: String(Date.now()), text, sender: 'user', time: agora() }]);
+    falar(text, 'user');
     if (!textToSend) setInputText('');
 
     try {
-      // 1º tenta o bot do servidor; se não houver conexão, usa o motor local.
-      let resultado = offline ? null : await enviarAoBot(sessionId, text);
-      if (!resultado) {
-        if (!offline) {
-          setOffline(true);
-          setMessages((prev) => [
-            ...prev,
-            { id: String(Date.now() + 3), text: AVISO_OFFLINE, sender: 'bot', time: agora() },
-          ]);
-        }
-        const local = await processarOffline(text, estado);
-        setEstado(local.estado);
-        resultado = local.resultado;
-      }
-
-      if (resultado.tipo === 'orientacao') {
-        setMessages((prev) => [
-          ...prev,
-          {
-            id: String(Date.now() + 1),
-            text: resultado.texto,
-            sender: 'bot',
-            time: agora(),
-            isFinal: true,
-          },
-        ]);
-        setFinalizado(true);
+      // Resposta à oferta de localização: bairro e cidade digitados.
+      if (aguardandoLocal && pareceEndereco(text)) {
+        await mostrarUnidades({ endereco: text });
         return;
       }
+      setAguardandoLocal(false);
 
-      setMessages((prev) => [
-        ...prev,
-        { id: String(Date.now() + 1), text: resultado.texto, sender: 'bot', time: agora() },
-      ]);
+      // Quem responde é o bot do servidor; sem conexão, só a guarda de emergência local.
+      const resultado = (await enviarAoBot(sessionId, text)) ?? respostaOffline(text);
+      const final = resultado.tipo === 'orientacao';
+      falar(resultado.texto, 'bot', { isFinal: final });
+      if (final) setTeveOrientacao(true);
+
+      if (resultado.local) {
+        setOferta(resultado.local);
+        setAguardandoLocal(true);
+        falar(
+          `📍 *Quer saber ${resultado.local.rotulo}?* Toque em *Enviar minha localização* ou escreva seu *bairro e cidade*.`,
+          'bot',
+        );
+      }
     } catch (error) {
-      console.error('Erro no processarTurno:', error);
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: String(Date.now() + 2),
-          text: 'Não consegui avaliar com segurança. Procure uma UBS. Se houver falta de ar, dor no peito, desmaio, confusão ou sangramento importante, acione o SAMU 192.',
-          sender: 'bot',
-          time: agora(),
-          isFinal: true,
-        },
-      ]);
-      setFinalizado(true);
+      console.error('Erro no chat:', error);
+      falar(TEXTO_SEM_CONEXAO, 'bot');
     } finally {
       setBusy(false);
     }
   };
 
+  // Compartilhar a localização do celular (equivale ao 📎 → Localização do WhatsApp).
+  const enviarLocalizacao = async () => {
+    if (busy) return;
+    if (!oferta) {
+      falar('Primeiro me conta o que você está sentindo, que eu indico o tipo de unidade e busco a mais próxima.', 'bot');
+      return;
+    }
+    setBusy(true);
+    try {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        falar('Sem permissão de localização. Você pode escrever seu *bairro e cidade* que eu busco.', 'bot');
+        setAguardandoLocal(true);
+        return;
+      }
+      falar('📍 Localização enviada', 'user');
+      const pos = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
+      await mostrarUnidades({ lat: pos.coords.latitude, lng: pos.coords.longitude });
+    } catch (error) {
+      console.error('Erro na localização:', error);
+      falar('Não consegui pegar sua localização. Escreva seu *bairro e cidade* que eu busco.', 'bot');
+      setAguardandoLocal(true);
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const recusarLocalizacao = () => {
+    setAguardandoLocal(false);
+    falar('Agora não', 'user');
+    falar('Tudo bem! Se precisar, é só me chamar. 💙', 'bot');
+  };
+
   const handleReiniciar = () => {
-    setFinalizado(false);
-    setEstado(ESTADO_INICIAL);
     setSessionId(novaSessao());
-    setOffline(!botRemotoConfigurado);
-    setMessages([
-      {
-        id: '1',
-        text: 'Olá! Sou o assistente do Direciona.Ai. Estou aqui para orientar você sobre os serviços de saúde disponíveis. Como posso ajudar?',
-        sender: 'bot',
-        time: agora(),
-      },
-    ]);
+    setOferta(null);
+    setAguardandoLocal(false);
+    setTeveOrientacao(false);
     setInputText('');
+    setMessages([{ id: novoId(), text: BOAS_VINDAS, sender: 'bot', time: agora() }]);
   };
 
   const renderMessage = ({ item }: { item: Message }) => {
     const isUser = item.sender === 'user';
-    const isFinal = item.isFinal || false;
 
     return (
       <View className={`my-1.5 ${isUser ? 'items-end' : 'items-start'}`}>
         <View
           style={{
-            maxWidth: '80%',
+            maxWidth: '82%',
             padding: 16,
-            borderRadius: isUser ? 18 : 18,
+            borderRadius: 18,
             borderBottomRightRadius: isUser ? 4 : 18,
             borderBottomLeftRadius: isUser ? 18 : 4,
-            backgroundColor: isUser
-              ? undefined
-              : '#ffffff',
+            backgroundColor: isUser ? undefined : COR.branco,
             borderWidth: isUser ? 0 : 1,
-            borderColor: isUser ? 'transparent' : '#e2eaf4',
-            shadowColor: '#142e66',
+            borderColor: isUser ? 'transparent' : COR.borda,
+            shadowColor: COR.azul,
             shadowOffset: { width: 0, height: 2 },
             shadowOpacity: isUser ? 0.25 : 0.06,
             shadowRadius: 8,
@@ -206,64 +215,55 @@ export default function ChatScreen() {
         >
           {isUser ? (
             <LinearGradient
-              colors={['#142e66', '#3380b2', '#3ea8c0']}
+              colors={DEGRADE}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 0 }}
-              style={{
-                borderRadius: 18,
-                borderBottomRightRadius: 4,
-                padding: 16,
-                margin: -16,
-              }}
+              style={{ borderRadius: 18, borderBottomRightRadius: 4, padding: 16, margin: -16 }}
             >
-              <Text className="text-white font-medium text-sm leading-5">
-                {textoFormatado(item.text)}
+              <Text className="text-white font-nunito text-[15px] leading-[22px]">
+                {textoFormatado(item.text, COR.branco)}
               </Text>
             </LinearGradient>
           ) : (
             <Text
-              className={`text-sm leading-5 ${
-                isFinal ? 'text-emerald-700 font-semibold' : 'text-[#525bab]'
+              className={`text-[15px] leading-[22px] ${
+                item.isFinal ? 'text-[#0b7a66] font-nunito-bold' : 'text-[#034268] font-nunito'
               }`}
             >
-              {textoFormatado(item.text)}
+              {textoFormatado(item.text, COR.verdeEscuro)}
             </Text>
           )}
         </View>
-        <Text className="text-[11px] text-slate-400 font-medium mt-1">
-          {item.time}
-        </Text>
+        <Text className="text-[11px] text-slate-400 font-nunito mt-1">{item.time}</Text>
       </View>
     );
   };
 
+  // Atalhos acima do campo de texto, conforme o momento da conversa.
+  const atalhos: { rotulo: string; acao: () => void; destaque?: boolean }[] = [];
+  if (aguardandoLocal) {
+    atalhos.push({ rotulo: '📍 Enviar minha localização', acao: enviarLocalizacao, destaque: true });
+    atalhos.push({ rotulo: 'Agora não', acao: recusarLocalizacao });
+  } else if (messages.length === 1) {
+    SUGESTOES.forEach((s) => atalhos.push({ rotulo: s, acao: () => handleSend(s) }));
+  }
+  if (teveOrientacao) atalhos.push({ rotulo: '🔄 Nova consulta', acao: handleReiniciar });
+
   return (
-    <SafeAreaView className="flex-1 bg-[#f0f4f8]">
-      <StatusBar barStyle="light-content" />
+    <SafeAreaView style={{ flex: 1, backgroundColor: COR.fundo }}>
+      <StatusBar barStyle="dark-content" />
 
-      {/* Header com gradiente */}
-      <LinearGradient
-        colors={['#142e66', '#3380b2', '#59d9d1']}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-        style={{ paddingTop: 8, paddingBottom: 12 }}
-      >
-        <View className="flex-row items-center justify-between px-5">
-          <TouchableOpacity
-            onPress={() => router.back()}
-            className="p-1"
-          >
-            <Ionicons name="arrow-back" size={24} color="#ffffff" />
-          </TouchableOpacity>
-          <Text className="text-[#142e66] text-3xl font-bold font-serif">
-            Direciona.ai
-          </Text>
-        </View>
-      </LinearGradient>
+      {/* Cabeçalho claro com o logo */}
+      <View style={styles.cabecalho}>
+        <TouchableOpacity onPress={() => router.back()} className="p-1">
+          <Ionicons name="arrow-back" size={24} color={COR.azul} />
+        </TouchableOpacity>
+        <Logo largura={128} />
+        <View style={{ width: 32 }} />
+      </View>
 
-      {/* Área de mensagens */}
       <KeyboardAvoidingView
-        className="flex-1"
+        style={{ flex: 1 }}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
       >
@@ -272,113 +272,101 @@ export default function ChatScreen() {
           data={messages}
           keyExtractor={(item) => item.id}
           renderItem={renderMessage}
+          // rola para a última mensagem sempre que o conteúdo cresce (inclusive listas longas)
+          onContentSizeChange={() => flatListRef.current?.scrollToEnd({ animated: true })}
           contentContainerStyle={{ paddingHorizontal: 20, paddingVertical: 12 }}
-          className="flex-1"
+          style={{ flex: 1 }}
         />
 
-        {/* Sugestões e input (se não finalizado) */}
-        {!finalizado ? (
-          <>
-            <View className="flex-row flex-wrap justify-center gap-2 px-4 py-2">
-              {suggestions.map((item) => (
-                <TouchableOpacity
-                  key={item}
-                  onPress={() => handleSend(item)}
-                  className="bg-white px-4 py-2 rounded-full border border-[#e2eaf4] shadow-sm"
-                >
-                  <Text className="text-[#525bab] font-medium text-xs">{item}</Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-
-            <View style={styles.inputBar}>
-              <View className="flex-row items-center gap-2.5">
-                {/* Botão "+" escuro (apenas visual) */}
-                <TouchableOpacity
-                  className="w-11 h-11 rounded-full bg-[#142e66] items-center justify-center"
-                  disabled
-                >
-                  <Ionicons name="add" size={22} color="#ffffff" />
-                </TouchableOpacity>
-
-                {/* Campo de texto com estilo neumorphism + ícone de microfone */}
-                <View style={[styles.textField, { flex: 1 }]}>
-                  <TextInput
-                    placeholder="Digite sua mensagem..."
-                    placeholderTextColor="#94a3b8"
-                    value={inputText}
-                    onChangeText={setInputText}
-                    editable={!busy}
-                    className="flex-1 text-sm font-medium text-slate-400"
-                  />
-                  <Ionicons name="mic-outline" size={18} color="#94a3b8" />
-                </View>
-
-                {/* Botão de enviar com gradiente */}
-                <TouchableOpacity
-                  onPress={() => handleSend()}
-                  disabled={busy}
-                  style={styles.sendButtonShadow}
-                >
-                  <LinearGradient
-                    colors={['#142e66', '#3380b2', '#3ea8c0']}
-                    start={{ x: 0, y: 0 }}
-                    end={{ x: 1, y: 0 }}
-                    style={{
-                      width: 44,
-                      height: 44,
-                      borderRadius: 22,
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                    }}
-                  >
-                    <Ionicons name="arrow-forward" size={18} color="#ffffff" />
-                  </LinearGradient>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </>
-        ) : (
-          // Tela finalizada – botão de reiniciar
-          <View className="p-4 bg-[#f0f4f8] items-center">
-            <TouchableOpacity
-              onPress={handleReiniciar}
-              className="bg-white px-8 py-3 rounded-full border border-[#e2eaf4] shadow-sm"
-            >
-              <Text className="text-[#525bab] font-bold text-sm tracking-wider">
-                🔄 Nova consulta
-              </Text>
-            </TouchableOpacity>
+        {atalhos.length > 0 && (
+          <View className="flex-row flex-wrap justify-center gap-2 px-4 py-2">
+            {atalhos.map(({ rotulo, acao, destaque }) => (
+              <TouchableOpacity
+                key={rotulo}
+                onPress={acao}
+                disabled={busy}
+                className={`px-4 py-2 rounded-full border shadow-sm ${
+                  destaque ? 'bg-[#14bc9a] border-[#14bc9a]' : 'bg-white border-[#dde5ec]'
+                }`}
+              >
+                <Text className={`font-nunito-bold text-xs ${destaque ? 'text-white' : 'text-[#034268]'}`}>
+                  {rotulo}
+                </Text>
+              </TouchableOpacity>
+            ))}
           </View>
         )}
+
+        <View style={styles.inputBar}>
+          <View className="flex-row items-center gap-2.5">
+            {/* "+" = enviar localização (como o 📎 do WhatsApp) */}
+            <TouchableOpacity
+              onPress={enviarLocalizacao}
+              disabled={busy}
+              accessibilityLabel="Enviar minha localização"
+              className="w-11 h-11 rounded-full bg-[#034268] items-center justify-center"
+            >
+              <Ionicons name="location-outline" size={21} color="#ffffff" />
+            </TouchableOpacity>
+
+            {/* Campo de texto com efeito "afundado" */}
+            <View style={[styles.textField, { flex: 1 }]}>
+              <TextInput
+                placeholder={aguardandoLocal ? 'Bairro e cidade...' : 'Digite sua mensagem...'}
+                placeholderTextColor="#94a3b8"
+                value={inputText}
+                onChangeText={setInputText}
+                onSubmitEditing={() => handleSend()}
+                returnKeyType="send"
+                editable={!busy}
+                className="flex-1 text-sm font-nunito text-[#1d3b53]"
+              />
+            </View>
+
+            {/* Enviar */}
+            <TouchableOpacity onPress={() => handleSend()} disabled={busy} style={styles.sendButtonShadow}>
+              <LinearGradient
+                colors={DEGRADE}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                style={{ width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center' }}
+              >
+                <Ionicons name="arrow-forward" size={18} color="#ffffff" />
+              </LinearGradient>
+            </TouchableOpacity>
+          </View>
+        </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
 
-// Sombras via StyleSheet nativo (funciona igual em iOS/Android — classes arbitrárias
-// tipo shadow-[inset_...] não renderizam de fato no React Native)
+// Sombras via StyleSheet nativo (classes arbitrárias tipo shadow-[inset_...]
+// não renderizam no React Native).
 const styles = StyleSheet.create({
+  cabecalho: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    backgroundColor: COR.branco,
+    borderBottomWidth: 1,
+    borderBottomColor: COR.borda,
+  },
+
   inputBar: {
     backgroundColor: 'rgba(240,244,248,0.8)',
     paddingHorizontal: 16,
     paddingBottom: 8,
     paddingTop: 14,
     ...Platform.select({
-      ios: {
-        shadowColor: '#000000',
-        shadowOffset: { width: 0, height: -4 },
-        shadowOpacity: 0.05,
-        shadowRadius: 12,
-      },
-      android: {
-        elevation: 6,
-      },
+      ios: { shadowColor: '#000000', shadowOffset: { width: 0, height: -4 }, shadowOpacity: 0.05, shadowRadius: 12 },
+      android: { elevation: 6 },
     }),
   },
 
-  // Campo de texto: simula profundidade "afundada" com bordas bicolor
-  // (mais escura em cima/esquerda, mais clara embaixo/direita)
+  // Bordas bicolor (mais escura em cima/esquerda) simulam o campo "afundado".
   textField: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -395,34 +383,17 @@ const styles = StyleSheet.create({
     borderBottomColor: 'rgba(255,255,255,0.9)',
     borderRightColor: 'rgba(255,255,255,0.9)',
     ...Platform.select({
-      ios: {
-        shadowColor: '#b2bdcc',
-        shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.25,
-        shadowRadius: 1.5,
-      },
-      android: {
-        elevation: 1,
-      },
+      ios: { shadowColor: '#b2bdcc', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.25, shadowRadius: 1.5 },
+      android: { elevation: 1 },
     }),
   },
 
   sendButtonShadow: Platform.select({
     ios: {
-      width: 44,
-      height: 44,
-      borderRadius: 22,
-      shadowColor: '#142e66',
-      shadowOffset: { width: 0, height: 4 },
-      shadowOpacity: 0.31,
-      shadowRadius: 10,
+      width: 44, height: 44, borderRadius: 22,
+      shadowColor: COR.azul, shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.31, shadowRadius: 10,
     },
-    android: {
-      width: 44,
-      height: 44,
-      borderRadius: 22,
-      elevation: 6,
-    },
+    android: { width: 44, height: 44, borderRadius: 22, elevation: 6 },
     default: { width: 44, height: 44, borderRadius: 22 },
   }) as ViewStyle,
 });

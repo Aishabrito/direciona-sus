@@ -1,14 +1,15 @@
 import { View, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Svg, { Path, Circle } from 'react-native-svg';
+import { COR } from '../constants/tema';
 
 // Ilustrações das telas de apresentação, recriadas com ícones e formas vetoriais
 // a partir do Figma. Para usar as artes originais, exporte-as do Figma em PNG e
 // troque cada componente por um <Image source={require('../assets/...')} />.
 
-const NAVY = '#142e66';
-const TEAL = '#2fb7b0';
-const BLUE = '#3380b2';
+const NAVY = COR.azul;
+const TEAL = COR.verde;
+const BLUE = COR.azulMedio;
 
 // 1. "Seu guia rápido no SUS": pessoa com o celular, cercada de unidade, mapa e prontuário
 export function GuiaIllustration() {
@@ -85,7 +86,7 @@ const styles = StyleSheet.create({
 
   halo: {
     width: 150, height: 150, borderRadius: 75,
-    backgroundColor: 'rgba(255,255,255,0.55)', alignItems: 'center', justifyContent: 'center',
+    backgroundColor: 'rgba(20,188,154,0.12)', alignItems: 'center', justifyContent: 'center',
   },
   pessoa: { alignItems: 'center' },
   celular: {
@@ -94,7 +95,7 @@ const styles = StyleSheet.create({
   },
   flutuante: {
     position: 'absolute', width: 52, height: 52, borderRadius: 14,
-    backgroundColor: 'rgba(255,255,255,0.85)', alignItems: 'center', justifyContent: 'center',
+    backgroundColor: '#ffffff', alignItems: 'center', justifyContent: 'center',
   },
 
   phone: {
@@ -107,7 +108,7 @@ const styles = StyleSheet.create({
   },
   phoneAvatar: { width: 16, height: 16, borderRadius: 8, backgroundColor: '#ffffff' },
   bolha: { height: 14, borderRadius: 7 },
-  bolhaBot: { alignSelf: 'flex-start', backgroundColor: '#dff3f2' },
+  bolhaBot: { alignSelf: 'flex-start', backgroundColor: '#e3f5f0' },
   bolhaUser: { alignSelf: 'flex-end', backgroundColor: BLUE },
 
   mapa: {
