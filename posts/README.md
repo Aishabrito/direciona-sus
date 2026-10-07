@@ -7,4 +7,4 @@ Para regerar os PNGs depois de editar o HTML (precisa do Playwright):
 node posts/renderizar.mjs posts/tema-2-como-funciona
 ```
 
-`fontes/` (Lexend, JetBrains Mono — licença OFL) e `img/` (logo e faixa de parceiros) são compartilhados entre os temas.
+`fontes/` (Nunito e outras, licença OFL) e `img/` (logo e faixa de parceiros) são compartilhados entre os temas.
