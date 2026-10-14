@@ -1,61 +1,62 @@
 # Direciona.AI — Centelha RJ Fase 2: textos para o formulário
 
-> Contagem de caracteres conferida (com espaços). Trechos entre [COLCHETES] precisam de dado de vocês.
+> **Prazo: 22/10/2026.** Contagem de caracteres conferida (com espaços). Os trechos entre [COLCHETES] precisam de dado de vocês.
 
-## ⚠️ Antes de colar: 3 ajustes importantes
+## Decisões tomadas
 
-1. **IA x "motor de regras".** A versão 1.6 diz que a solução "não depende de IA aberta". O código real (app + back.direciona) usa **guarda de emergência determinística → IA (LLM) → piso de validação por regras**. Os textos abaixo descrevem essa arquitetura híbrida: é a verdade, encaixa na categoria "IA e Machine Learning" do projeto e responde melhor ao Avaliador 2 ("todo hospital tem IA de fila"): a IA de vocês só interpreta a fala; quem decide o destino são regras validadas por médicos.
-2. **Médica nova.** Troquei "Paloma" por "médica consultora". Atualizar a aba Equipe com a nova pessoa.
-3. **Não prometa venda em 12 meses.** O edital diz que tudo no cronograma precisa ser executado. Ciclo de compra de prefeitura é lento, então a meta proposta é **piloto validado + 1 proposta em negociação**, não "2–3 contratos assinados".
+- **Produto do Centelha ≠ JCC.** O JCC é o protótipo (app + bot). O Centelha é a plataforma replicável vendida a prefeituras: um código só, configurado por cidade, com app e WhatsApp com a marca de cada prefeitura e painel do gestor.
+- **Equipe:** Aisha (coordenação e desenvolvimento), Pamella (negócios, 20h/semana), segundo desenvolvedor (na equipe, sem bolsa), enfermeira gerente de UBS há mais de 20 anos (CLT de OS; confirmar). Bolsas CNPq (R$ 45.580) só para Aisha e Pamella. **As bolsas não entram na tabela de orçamento.**
+- **Edital:** pró-labore e salário proibidos; membro da equipe não pode ser pago pela subvenção; contrapartida mínima de 3%; equipamentos até 50%.
+- **Validação sem depender da prefeitura:** validação clínica, testes com cidadãos (Naves do Conhecimento e projetos sociais) com dados públicos do CNES, painel mostrado a gestores. O piloto oficial é meta, com plano B.
+- **Integração com e-SUS e SINAN:** fica pronta para ligar e é oferecida depois do Centelha, conforme o interesse da prefeitura.
+
+## Pendências
+
+1. Universidade: o cadastro diz UNIRIO e o texto diz UFRJ. Corrigir na aba Equipe.
+2. Cadastrar a enfermeira e o segundo desenvolvedor na equipe, com carta de anuência de cada um. Confirmar que a enfermeira não é servidora pública.
+3. Resultados de testes do protótipo do JCC, se houver, em Mercado (c) e no PDF de evidências.
+4. Apple: apps replicados por cliente costumam ter de ser publicados na conta da própria prefeitura (diretriz 4.2.6). Prever isso no contrato.
+5. Nuvem, IA e Apple cobram em dólar. Na prestação de contas, prefiram fornecedores com nota fiscal no Brasil.
 
 ---
 
 ## SOLUÇÃO
 
 ### Descrição da solução
-*1366/1500 caracteres*
+*1453/1500 caracteres*
 
-O Direciona.AI é uma plataforma de triagem assistiva e orientação de acesso ao SUS: o cidadão conta, por WhatsApp, aplicativo ou voz, o que está sentindo, em linguagem do dia a dia, e recebe a indicação da porta de entrada certa (UBS/Clínica da Família, UPA ou SAMU 192), com a unidade mais próxima, distância e rota.
-a) Inovação: atua ANTES de o paciente sair de casa e em toda a rede municipal. Arquitetura híbrida e segura: uma guarda determinística reconhece 17 categorias de emergência (AVC, dor no peito, convulsão etc.) e aciona o 192 sem passar pela IA; a IA apenas interpreta a linguagem natural; e um piso de validação com protocolos aprovados por médicos decide o destino. Não diagnostica nem prescreve.
-b) Funcionalidades: chat no WhatsApp e no app, entrada por voz, unidades próximas por geolocalização, modo offline para emergências, regras configuráveis por município e painel da prefeitura com dados agregados e anonimizados (demanda por sintoma, bairro e horário, mapa de calor).
-c) Diferenciais: IAs de fila de hospitais organizam quem já chegou à unidade; teleconsultas substituem a consulta. O Direciona.AI organiza a entrada na rede pública antes do deslocamento, sem pedir CPF ou dados identificáveis (LGPD).
-d) Benefícios: menos casos leves nas UPAs, orientação gratuita e acessível ao cidadão e dados para o gestor planejar equipes e insumos.
+O Direciona.AI é uma plataforma de triagem assistiva que a prefeitura contrata para orientar o cidadão sobre onde buscar atendimento no SUS. A pessoa conta, pelo WhatsApp da prefeitura, pelo app com a marca do município ou por voz, o que está sentindo, e recebe a porta de entrada certa (UBS/Clínica da Família, UPA ou SAMU 192), com a unidade mais próxima e a rota.
+a) Inovação: atua ANTES de o paciente sair de casa e em toda a rede municipal. Arquitetura híbrida e segura: uma guarda determinística reconhece 17 categorias de emergência e aciona o 192 sem passar pela IA; a IA apenas interpreta a linguagem natural; e um piso de validação com protocolos clínicos validados decide o destino. Não diagnostica nem prescreve.
+b) Funcionalidades: uma única plataforma configurada por município (unidades, horários, regras locais, número de WhatsApp, marca); entrada por voz; geolocalização; modo offline para emergências; painel do gestor com perfis de acesso, dados agregados e anonimizados e mapa de calor por sintoma, bairro e horário; estrutura pronta para integrar com e-SUS e SINAN.
+c) Diferenciais: IAs de fila de hospitais organizam quem já chegou; teleconsultas substituem a consulta. O Direciona.AI organiza a entrada na rede pública antes do deslocamento, sem pedir CPF (LGPD), e é replicável: nova cidade é configuração, não novo código.
+d) Benefícios: menos casos leves nas UPAs, orientação gratuita ao cidadão e dados para o gestor planejar.
 
-### Estágio atual
-**Protótipo testado.** Só marquem *Protótipo beta* se já houve teste com grupo de usuários reais fora da equipe.
+**Estágio atual:** Protótipo testado  
+**Estágio pretendido:** MVP
 
-### Evidências (PDF até 5 MB): sugestão de conteúdo
-1. Prints do app (abertura, boas-vindas, chat, lista de unidades com rota)
-2. Prints de conversa no WhatsApp: um caso leve → UBS, um caso grave → 192
-3. Diagrama da arquitetura: guarda de emergência → IA → validação → unidades próximas
-4. Resultado de testes: nº de casos simulados testados e % de emergências escaladas corretamente
-5. Parecer ou declaração curta da médica sobre a revisão dos protocolos
-6. Trecho da política de dados (sem CPF, relato não armazenado)
+**PDF de evidências (até 5 MB):** prints do app e do WhatsApp (um caso leve → UBS, um grave → 192), diagrama da arquitetura (guarda → IA → validação → unidades), resultado dos testes automáticos dos casos de emergência, trecho da política de dados e, se houver, depoimento da enfermeira sobre o fluxo.
 
-### Estágio pretendido
-**MVP**
+### Estratégia de desenvolvimento
+*1459/1500 caracteres*
 
-### Estratégia para o desenvolvimento
-*1473/1500 caracteres*
-
-O núcleo tecnológico é desenvolvido pela própria equipe, sem terceirização: Aisha (full-stack) conduz app (React Native/Expo), backend (Node.js) e integrações; Pamella conduz modelo de negócio, indicadores e prospecção; a médica consultora valida os protocolos clínicos.
-a) Recursos: pró-labore da equipe, consultoria médica remunerada, nuvem, WhatsApp Business API, APIs de IA, voz e mapas, celulares de teste, assessoria jurídica (LGPD/regulatório) e apoio de UX/acessibilidade.
-b) Produção: software em nuvem (SaaS), entregas mensais com método ágil, testes automatizados dos casos de emergência a cada versão e versionamento das regras clínicas, registrando qual regra gerou cada orientação (auditoria sem guardar o relato).
-c) Pesquisas: (1) validação clínica dos critérios de encaminhamento, com base no Protocolo de Manchester e na Carteira de Serviços da APS; (2) bateria de casos simulados revisada por médicos para medir acerto e segurança; (3) testes de usabilidade com idosos e pessoas de baixa escolaridade em Naves do Conhecimento e UBS; (4) piloto em município parceiro medindo redirecionamentos e satisfação.
-d) Certificação: avaliação do enquadramento como Software como Dispositivo Médico (RDC 657/2022 da ANVISA) com assessoria especializada, relatório de impacto à proteção de dados (LGPD) e boas práticas de segurança da informação. No piloto, a ferramenta atua como apoio à orientação, sem diagnóstico, e com o fluxo validado pela secretaria de saúde.
+Partimos do protótipo (app e bot de WhatsApp com guarda de emergência) criado no programa Jovens Cientistas Cariocas e o transformamos em plataforma replicável para prefeituras.
+a) Recursos: equipe executora (Aisha e um segundo desenvolvedor no app, bot e motor de regras; Pamella em negócios, 20h/semana; enfermeira gerente de UBS há 20+ anos nos fluxos da Atenção Primária), bolsas CNPq e, pela subvenção: desenvolvimento terceirizado, design, médico consultor, jurídico, nuvem, APIs e equipamentos.
+b) Produção: núcleo clínico e app desenvolvidos pela equipe; painel do gestor e área administrativa multi-cidade terceirizados por entregas, com especificação e aceite pela equipe. Código único com versão do app gerada para cada prefeitura, entregas mensais, testes automáticos dos casos de emergência a cada versão e regras versionadas e auditáveis.
+c) Pesquisas: validação dos critérios de encaminhamento (Protocolo de Manchester e Carteira de Serviços da APS) pela enfermeira e por médico consultor; casos simulados para medir acerto e segurança; testes de usabilidade com idosos e pessoas de baixa escolaridade; testes com cidadãos em Naves do Conhecimento e projetos sociais, usando unidades reais (dados públicos do CNES).
+d) Certificação: avaliação do enquadramento como Software como Dispositivo Médico (RDC 657/2022 da ANVISA) com assessoria jurídica, relatório de impacto à proteção de dados (LGPD), teste de segurança e registro da marca no INPI.
 
 ---
 
 ## IMPACTO
 
-**Opção:** "O objetivo principal da solução proposta é resolver um desafio socioambiental."
+**Opção:** O objetivo principal da solução proposta é resolver um desafio socioambiental.
 
-### Descrição do desafio socioambiental
-*1367/1500 caracteres*
+### Desafio socioambiental
+*1400/1500 caracteres*
 
 (a) Problema: as UPAs, criadas para urgências, viraram porta de entrada de casos leves. Em Patos de Minas (MG), 76,9% dos atendimentos de out/2025 foram de baixa complexidade; na UPA Zona Norte de Macapá, 66% dos atendimentos de jan a set/2025 foram classificados como verde ou azul no Protocolo de Manchester. O resultado são filas de horas, atraso no cuidado de casos graves, equipes sobrecarregadas e uso caro de uma estrutura de urgência para o que a UBS resolveria.
 Causas: falta de informação sobre qual serviço procurar; horários e localização das unidades pouco conhecidos; hábito de buscar a UPA por estar sempre aberta; e baixa literacia em saúde e digital da população mais vulnerável. Do lado da gestão, faltam dados em tempo real da demanda para planejar.
-(b) Impactos positivos: casos leves redirecionados à atenção primária, fortalecendo o vínculo com a UBS; capacidade das UPAs liberada para urgências reais; emergências reconhecidas e encaminhadas ao 192 mais rápido; acesso à orientação em saúde ampliado para idosos e pessoas de baixa renda e escolaridade (voz, WhatsApp, linguagem simples, gratuito ao cidadão); e dados agregados e anonimizados para o gestor planejar equipes, insumos e ações preventivas, como picos de síndromes gripais ou arboviroses por bairro. Meta do piloto: 30% dos casos leves orientados à UBS. Contribui com os ODS 3 e 10.
+(b) Impactos positivos: casos leves redirecionados à atenção primária, fortalecendo o vínculo com a UBS; capacidade das UPAs liberada para urgências reais; emergências reconhecidas e encaminhadas ao 192 mais rápido; acesso à orientação em saúde ampliado para idosos e pessoas de baixa renda e escolaridade (voz, WhatsApp, linguagem simples, gratuito ao cidadão); e dados agregados e anonimizados para o gestor planejar equipes, insumos e ações preventivas, como picos de síndromes gripais ou arboviroses por bairro. Meta: ≥ 90% de concordância das orientações com a avaliação de profissionais de saúde. Contribui com os ODS 3 e 10.
 
 ### Impactos negativos e mitigação
 *1417/1500 caracteres*
@@ -73,11 +74,11 @@ Causas: falta de informação sobre qual serviço procurar; horários e localiza
 ## MERCADO
 
 ### Descrição do mercado
-*1412/1500 caracteres*
+*1419/1500 caracteres*
 
 a) Tamanho: o Brasil tem 5.570 municípios; a atenção primária está em todos e as UPAs nas cidades acima de 50 mil habitantes. Mercado inicial: os 92 municípios do RJ, começando pela Região Metropolitana; depois, nacional. A saúde digital no Brasil movimentou US$ 12,4 bi em 2025, com projeção de US$ 44 bi até 2034 (15,3% a.a.).
 b) Tendências: mercado em expansão, impulsionado pela Estratégia de Saúde Digital do SUS, pelo Marco Legal das Startups (CPSI) e pela pressão por eficiência nos gastos municipais.
-c) Estudos: protótipo funcional (app e WhatsApp) avaliado internamente e com médica da Atenção Primária. [COMPLETAR: entrevistas/testes feitos, nº de pessoas e principal achado]
+c) Estudos: protótipo funcional (app e WhatsApp) avaliado internamente e com profissionais da Atenção Primária. [COMPLETAR: entrevistas/testes feitos, nº de pessoas e principal achado]
 d) Concorrentes: TopMed (teletriagem com profissional, foco em teleconsulta); Mar Saúde (triagem por IA, foco em planos de saúde); Soul.Gov (plataforma hospitalar ampla); IAs de fila de hospitais (organizam quem já chegou a uma unidade); totens de pré-triagem (exigem ir à UPA); mapas de calor e vigilância participativa (Guardiões da Saúde, Painéis CONASEMS), que observam a demanda mas não orientam o cidadão. Nenhum une orientação antes do deslocamento, redirecionamento na rede pública, WhatsApp/voz e painel para o gestor.
 e) Canais: venda direta a secretarias municipais de saúde, consórcios intermunicipais, eventos do COSEMS-RJ e CONASEMS, parceiros que já fornecem sistemas a prefeituras e chamadas de inovação/CPSI.
 
@@ -90,15 +91,14 @@ c) Clientes: secretarias municipais de saúde de cidades com UPA e rede de UBS (
 Público que recebe a intervenção: usuários do SUS (cerca de 7 em cada 10 brasileiros dependem só dele), com foco em quem mais sofre com filas e falta de informação: idosos, pessoas de baixa renda e baixa escolaridade, cuidadores e mães de crianças pequenas. Por isso o canal principal é o WhatsApp, com voz e linguagem simples.
 Beneficiados indiretos: profissionais das UPAs (menos sobrecarga), equipes de Saúde da Família (mais vínculo com o território), pacientes graves (atendidos mais rápido) e a vigilância epidemiológica (sinais precoces de surtos por bairro).
 
-### Modelo de negócio
-**B2G.** O B2B (clínicas/operadoras) entra no texto como receita futura. Marcar B2G2B dilui o foco e deixa de mostrar quem paga.
+**Modelo de negócio:** B2G
 
 ### Monetização
-*1343/1500 caracteres*
+*1384/1500 caracteres*
 
 SaaS por assinatura anual paga pela prefeitura; o cidadão usa de graça. O preço inclui implantação, configuração das unidades e regras locais, treinamento, suporte e atualizações, e varia pelo porte: até 50 mil hab., R$ 36-60 mil/ano; 50 a 200 mil, R$ 60-120 mil/ano; acima de 200 mil, R$ 120-250 mil/ano. Receitas complementares: módulo analítico avançado (R$ 18-48 mil/ano, com séries históricas e integração com e-SUS/SINAN), relatórios epidemiológicos sob demanda e, a partir do 2º ano, licença B2B para clínicas populares e operadoras (R$ 400-1.800/mês).
 Contratação: municípios menores por dispensa de licitação por valor (Lei 14.133/2021, art. 75, II); maiores pelo Contrato Público para Solução Inovadora (CPSI, LC 182/2021), que permite piloto remunerado e posterior fornecimento sem nova licitação.
-Como os clientes conhecerão: piloto em 1 município como caso de referência; apresentações ao COSEMS-RJ, consórcios e eventos do CONASEMS; parcerias com empresas que já vendem sistemas a prefeituras. Para o cidadão, a prefeitura divulga: cartazes com QR Code e número do WhatsApp nas UBS e UPAs, agentes comunitários, redes sociais e Naves do Conhecimento.
+Como os clientes conhecerão: testes com cidadãos e proposta de piloto gratuito a municípios como caso de referência; apresentações ao COSEMS-RJ, consórcios e eventos do CONASEMS; parcerias com empresas que já vendem sistemas a prefeituras. Para o cidadão, a prefeitura divulga: cartazes com QR Code e número do WhatsApp nas UBS e UPAs, agentes comunitários, redes sociais e Naves do Conhecimento.
 Escalabilidade: o mesmo software atende novos municípios apenas com configuração (unidades, horários, regras locais), com custo marginal baixo; meta de 3 a 5 contratos no 2º ano.
 
 ---
@@ -106,95 +106,96 @@ Escalabilidade: o mesmo software atende novos municípios apenas com configuraç
 ## GESTÃO
 
 ### Gestão do negócio
-*802/1000 caracteres*
+*841/1000 caracteres*
 
-Papéis: Aisha - produto e tecnologia; Pamella - negócios, finanças e relação com prefeituras; médica consultora - qualidade clínica. Ritos: planejamento mensal por metas (OKRs), reunião semanal de acompanhamento e revisão clínica mensal das regras.
-Métricas de produto: conversas/mês, % de casos leves orientados à UBS, % de emergências encaminhadas ao 192, taxa de conclusão da triagem, satisfação e disponibilidade do sistema.
+Papéis: Aisha (coordenação, produto e tecnologia); segundo desenvolvedor (app, bot e integrações); Pamella (negócios, finanças e relação com prefeituras); enfermeira (fluxos e qualidade assistencial). Ritos: planejamento mensal por metas (OKRs), reunião semanal e revisão clínica mensal das regras.
+Métricas de produto: conversas/mês, % de casos leves orientados à UBS, % de emergências encaminhadas ao 192, conclusão da triagem, satisfação e disponibilidade.
 Métricas de negócio: prefeituras no funil, reuniões, propostas, contratos, receita recorrente, custo por município e caixa.
-Qualidade e conformidade: casos críticos testados a cada versão, registro de incidentes e controles da LGPD.
-Ferramentas: GitHub (código e tarefas), Trello/Notion, CRM gratuito (HubSpot), planilha financeira e painéis de indicadores (Looker Studio).
+Qualidade: casos críticos testados a cada versão, registro de incidentes, controles LGPD e aceite formal das entregas terceirizadas.
+Ferramentas: GitHub (código e tarefas), Trello/Notion, CRM gratuito (HubSpot), planilha financeira e painéis de indicadores.
 
-- **Maturidade atual:** *Identificação dos requisitos do cliente* (se já conversaram com profissionais, gestores ou usuários). Se não conversaram, marquem *Identificação do nicho de mercado*.
-- **Maturidade pretendida:** *Aplicação/Validação no cliente*, coerente com o piloto.
+**Maturidade atual:** Identificação dos requisitos do cliente  
+**Maturidade pretendida:** Negociação da primeira venda
 
 ---
 
-## CRONOGRAMA (7 etapas, M1 = 1º mês do projeto)
+## CRONOGRAMA (M1 = 1º mês após o Termo de Outorga)
 
 | Etapa | Atividade | Descrição | Indicadores | Início | Fim |
 |---|---|---|---|---|---|
-| **1. Validação clínica e segurança** | 1.1 Revisão dos protocolos de encaminhamento | Médica revisa critérios UBS/UPA/192 com base no Protocolo de Manchester e na Carteira de Serviços da APS | Documento de protocolos validado e assinado pela médica | M1 | M2 |
-| | 1.2 Bateria de casos simulados | Montar e rodar casos clínicos simulados, comparando a orientação do sistema com a da médica | 300 casos testados; 100% das emergências críticas escaladas; ≥ 90% de concordância | M2 | M3 |
-| | 1.3 Conformidade LGPD e regulatória | RIPD, termos de uso, política de privacidade e parecer sobre enquadramento ANVISA (SaMD) | RIPD concluído; parecer regulatório emitido | M1 | M3 |
-| **2. MVP do cidadão** | 2.1 Voz e acessibilidade | Entrada e saída por voz no app e no WhatsApp; ajustes para leitor de tela e linguagem simples | Voz publicada; app aprovado em checklist de acessibilidade | M2 | M4 |
-| | 2.2 Configuração por município | Cadastro de unidades, horários e regras locais sem mexer no código | Município configurado em ≤ 2 dias | M3 | M5 |
-| | 2.3 Publicação | Publicar o app nas lojas e verificar o número oficial do WhatsApp Business | App na Play Store e App Store; WhatsApp verificado | M4 | M5 |
-| **3. Painel do gestor** | 3.1 Coleta anonimizada | Registro de eventos sem dados pessoais (sintoma categorizado, bairro, horário, destino) | Base de dados anonimizada em produção | M4 | M5 |
-| | 3.2 Painel v1 | Demanda por sintoma, região, horário e destino, com mapa de calor | Painel v1 publicado | M5 | M7 |
-| | 3.3 Validação com gestores | Apresentar o painel a gestores e coletar requisitos | ≥ 3 gestores entrevistados; relatório de ajustes | M6 | M7 |
-| **4. Usabilidade com o público-alvo** | 4.1 Testes presenciais | Testes em Naves do Conhecimento e UBS com idosos e pessoas de baixa escolaridade | ≥ 40 participantes (≥ 15 idosos); nota SUS ≥ 70 | M4 | M6 |
-| | 4.2 Ajustes de UX e linguagem | Corrigir pontos de dificuldade encontrados | Nova versão com ajustes; taxa de conclusão ≥ 80% | M6 | M7 |
-| **5. Piloto municipal** | 5.1 Parceria com município | Prospectar secretarias e formalizar piloto (termo de cooperação ou CPSI) | ≥ 10 secretarias contatadas; 1 termo assinado | M3 | M6 |
-| | 5.2 Implantação | Configurar unidades, treinar equipes e preparar a divulgação (QR Code nas unidades) | Equipes treinadas; material de divulgação nas unidades | M6 | M7 |
-| | 5.3 Operação do piloto | Uso real com acompanhamento semanal e auditoria clínica de amostra de casos | ≥ 1.000 conversas; ≥ 30% dos casos leves orientados à UBS; ≥ 85% de satisfação; 0 emergência subtriada na amostra auditada | M7 | M10 |
-| | 5.4 Relatório de impacto | Consolidar resultados para a secretaria e para a venda | Relatório publicado | M10 | M11 |
-| **6. Comercialização** | 6.1 Proposta comercial | Precificação final, proposta padrão e modelos de contratação (dispensa e CPSI) | Kit comercial pronto | M8 | M9 |
-| | 6.2 Prospecção | Demonstrações a municípios, COSEMS-RJ e consórcios; eventos do setor | 15 municípios contatados; 5 demonstrações; 2 eventos | M9 | M12 |
-| | 6.3 Primeira negociação | Converter o piloto ou outro município em contrato | 1 proposta formal em negociação | M11 | M12 |
-| **7. Gestão do projeto** | 7.1 Estruturação | CNPJ, contabilidade, conta do projeto e ferramentas de gestão | Empresa e ferramentas operando | M1 | M1 |
-| | 7.2 Relatório final | Prestação de contas e relatório final ao Centelha | Relatório entregue | M12 | M12 |
+| **1. Estruturação** | 1.1 Estruturação da empresa e do projeto | Conta do projeto, contabilidade, ferramentas de gestão e cotação de preços dos fornecedores | Fornecedores contratados com cotação registrada | M1 | M2 |
+| | 1.2 Especificação da plataforma | Requisitos do painel e da área multi-cidade, validados com a enfermeira | Documento de requisitos aprovado | M1 | M2 |
+| **2. Validação clínica e segurança** | 2.1 Protocolos de encaminhamento | Enfermeira e médico consultor revisam critérios UBS/UPA/192 (Manchester e Carteira de Serviços da APS) | Relatório de validação assinado | M1 | M3 |
+| | 2.2 Bateria de casos simulados | Casos clínicos simulados comparando a orientação do sistema com a dos profissionais | 300 casos; 100% das emergências críticas escaladas; ≥ 90% de concordância | M2 | M4 |
+| | 2.3 LGPD e regulatório | RIPD, termos, termo de consentimento e parecer ANVISA | Documentos e parecer concluídos | M1 | M3 |
+| **3. Plataforma multi-cidade** | 3.1 Área administrativa | Cadastro de unidades, horários e regras por município, com dados do CNES | Nova cidade configurada em ≤ 2 dias | M2 | M5 |
+| | 3.2 App e WhatsApp por prefeitura | Versão do app e do WhatsApp com nome, logo e cores de cada município, gerada a partir do mesmo código | 2 municípios configurados (Rio de Janeiro e Maricá, para demonstração) | M3 | M6 |
+| | 3.3 Voz | Entrada por áudio e resposta falada no app e no WhatsApp | Voz publicada nos dois canais | M2 | M4 |
+| | 3.4 Teste de segurança | Pentest e correções | Relatório sem falhas críticas abertas | M6 | M7 |
+| **4. Painel do gestor** | 4.1 Coleta anonimizada | Eventos sem dado pessoal: sintoma categorizado, bairro, horário, destino | Base anonimizada em produção | M3 | M4 |
+| | 4.2 Painel e mapa de calor | Indicadores de demanda, mapa de calor e perfis de acesso | Painel publicado | M4 | M7 |
+| | 4.3 Validação com gestores | Demonstração do painel, com dados dos testes, a gestores e coordenadores de saúde | ≥ 5 gestores ouvidos; relatório de ajustes | M7 | M9 |
+| **5. Testes com cidadãos** | 5.1 Usabilidade | Testes em Naves do Conhecimento e projetos sociais com idosos e pessoas de baixa escolaridade | ≥ 60 participantes (≥ 20 idosos); nota SUS ≥ 70 | M5 | M7 |
+| | 5.2 Teste comunitário ampliado | Uso livre do app e do WhatsApp configurados com unidades reais, com auditoria clínica de amostra | ≥ 300 usuários; ≥ 85% de satisfação; ≥ 90% de concordância na amostra auditada | M7 | M10 |
+| | 5.3 Ajustes | Melhorias de linguagem, fluxo e regras a partir dos testes | Versão MVP publicada | M8 | M10 |
+| **6. Prefeituras e vendas** | 6.1 Kit comercial | Proposta, preços, modelos de contrato (dispensa e CPSI), site e vídeo | Kit pronto | M6 | M8 |
+| | 6.2 Prospecção | Apresentações a secretarias da Região Metropolitana (ex.: Maricá), COSEMS-RJ e eventos | ≥ 10 secretarias contatadas; ≥ 5 apresentações; 1 evento nacional | M6 | M12 |
+| | 6.3 Piloto assistido *(meta)* | Termo de cooperação, sem custo, para uso oficial numa unidade ou região. **Plano B:** ampliar o teste comunitário | 1 termo firmado **ou** teste comunitário com ≥ 500 usuários | M8 | M12 |
+| | 6.4 Primeira negociação | Proposta comercial formal a um município interessado | 1 proposta formal em negociação | M10 | M12 |
+| **7. Encerramento** | 7.1 Relatório final | Resultados, prestação de contas e plano do 2º ano | Relatório entregue | M12 | M12 |
 
 ---
 
-## ORÇAMENTO (subvenção R$ 128.000 + contrapartida R$ 6.400 = 5%)
+## ORÇAMENTO
 
-> Conferir no edital FAPERJ 12/2026 o teto, os limites de pró-labore e quais itens são financiáveis. Tirei a "contingência 10%" do plano antigo porque reserva genérica costuma ser glosada.
-
+### Custeio
 | # | Rubrica | Origem | Descrição e justificativa | Qtd | Unit. (R$) | Total (R$) |
 |---|---|---|---|---|---|---|
-| C1 | Pró-labore dos sócios | Subvenção | Aisha: desenvolvimento do app, backend, IA e painel | 12 | 2.800 | 33.600 |
-| C2 | Pró-labore dos sócios | Subvenção | Pamella: modelo de negócio, indicadores, prospecção e gestão | 12 | 1.600 | 19.200 |
-| C3 | Serviços de Terceiros PF | Subvenção | Consultoria médica: validação dos protocolos, casos simulados e auditoria do piloto (~10 h/mês) | 12 | 1.800 | 21.600 |
-| C4 | Serviços de Terceiros PF | Subvenção | Designer UX/acessibilidade: telas do painel e ajustes para público de baixa escolaridade | 1 | 6.000 | 6.000 |
-| C5 | Serviços de Terceiros PJ | Subvenção | Hospedagem em nuvem (servidor e banco de dados) | 12 | 700 | 8.400 |
-| C6 | Serviços de Terceiros PJ | Subvenção | WhatsApp Business API (mensagens) | 12 | 450 | 5.400 |
-| C7 | Serviços de Terceiros PJ | Subvenção | APIs de IA (interpretação de texto) e de voz (fala para texto e texto para fala) | 12 | 550 | 6.600 |
-| C8 | Serviços de Terceiros PJ | Subvenção | API de mapas e geolocalização das unidades | 12 | 250 | 3.000 |
-| C9 | Serviços de Terceiros PJ | Subvenção | Assessoria jurídica: LGPD (RIPD, termos) e parecer regulatório ANVISA | 1 | 8.700 | 8.700 |
-| C10 | Serviços de Terceiros PJ | Subvenção | Site, vídeo demonstrativo e material comercial | 1 | 5.000 | 5.000 |
-| C11 | Serviços de Terceiros PJ | Subvenção | Contas de desenvolvedor Apple e Google para publicar o app | 1 | 800 | 800 |
-| C12 | Passagens nacionais | Subvenção | Participação em eventos de gestão de saúde (ex.: Congresso CONASEMS) | 3 | 900 | 2.700 |
-| C13 | Material de consumo | Subvenção | Cartazes e adesivos com QR Code para divulgação nas unidades do piloto | 1 | 1.500 | 1.500 |
-| C14 | Serviços de Terceiros PJ | Contrapartida | Contabilidade da empresa | 12 | 300 | 3.600 |
-| C15 | Diárias/locomoção | Contrapartida | Deslocamentos ao município piloto, UBS e Naves do Conhecimento | 14 | 200 | 2.800 |
-| K1 | Equipamentos | Subvenção | Celular Android de entrada, para testar em aparelho igual ao do público-alvo | 1 | 1.300 | 1.300 |
-| K2 | Equipamentos | Subvenção | iPhone para testes e publicação na App Store | 1 | 4.200 | 4.200 |
+| C1 | Serviços de Terceiros PJ | Subvenção | Desenvolvimento do painel web do gestor (indicadores de demanda. mapa de calor. perfis de acesso). contratado por entregas com aceite da equipe. Estimativa: 375 h × R$ 80/h (referência de desenvolvedor pleno PJ). | 1 | 30.000 | 30.000 |
+| C2 | Serviços de Terceiros PJ | Subvenção | Desenvolvimento da área administrativa multi-cidade (cadastro de unidades. horários e regras; configuração do app e do WhatsApp de cada prefeitura). por entregas. Estimativa: 206 h × R$ 80/h. | 1 | 16.500 | 16.500 |
+| C3 | Serviços de Terceiros PF | Subvenção | Design de interface do painel do gestor e do modelo visual do app adaptável à marca de cada prefeitura. com foco em acessibilidade. Estimativa: 100 h × R$ 80/h. | 1 | 8.000 | 8.000 |
+| C4 | Serviços de Terceiros PF | Subvenção | Médico(a) consultor(a): revisão e validação dos protocolos de encaminhamento (UBS/UPA/192) e da bateria de casos simulados. com relatório técnico assinado. Estimativa: 40 h × R$ 200/h. | 1 | 8.000 | 8.000 |
+| C5 | Serviços de Terceiros PF | Subvenção | Médico(a) consultor(a): auditoria clínica de amostra das orientações dadas nos testes com usuários reais. com relatório. Estimativa: 20 h × R$ 200/h. | 1 | 4.000 | 4.000 |
+| C6 | Serviços de Terceiros PJ | Subvenção | Assessoria jurídica em proteção de dados: relatório de impacto (RIPD). termos de uso. política de privacidade e termo de consentimento dos testes (LGPD). | 1 | 5.000 | 5.000 |
+| C7 | Serviços de Terceiros PJ | Subvenção | Assessoria jurídica: modelo de contrato e de termo de cooperação com prefeituras (dispensa e CPSI) e parecer sobre enquadramento na RDC 657/2022 da ANVISA. | 1 | 5.000 | 5.000 |
+| C8 | Serviços de Terceiros PJ | Subvenção | Teste de segurança (pentest) da plataforma e do painel antes da apresentação a prefeituras. exigência comum de áreas de TI municipais. | 1 | 6.000 | 6.000 |
+| C9 | Serviços de Terceiros PJ | Subvenção | Hospedagem em nuvem (servidor da aplicação e banco de dados) durante os 12 meses. | 12 | 600 | 7.200 |
+| C10 | Serviços de Terceiros PJ | Subvenção | WhatsApp Business API (mensagens e números dos ambientes de teste e demonstração). | 12 | 350 | 4.200 |
+| C11 | Serviços de Terceiros PJ | Subvenção | APIs de IA para interpretação de texto e de voz (transcrição de áudio e fala). usadas pelo assistente. | 12 | 400 | 4.800 |
+| C12 | Serviços de Terceiros PJ | Subvenção | API de mapas e geolocalização para cálculo de distância e rota até as unidades. | 12 | 150 | 1.800 |
+| C13 | Material de consumo | Subvenção | Licenças de software de desenvolvimento e testes (build e publicação de apps. monitoramento de erros). | 12 | 150 | 1.800 |
+| C14 | Serviços de Terceiros PJ | Subvenção | Contas de desenvolvedor Google Play e Apple para publicação das versões do app. | 1 | 800 | 800 |
+| C15 | Diárias ou despesas de hospedagem. alimentação e locomoção | Subvenção | Locomoção (combustível e pedágio) da equipe para testes comunitários e reuniões com secretarias municipais de saúde da Região Metropolitana. | 24 | 150 | 3.600 |
+| C16 | Serviços de Terceiros PJ | Subvenção | Site institucional e vídeo de demonstração da plataforma para apresentação a prefeituras. | 1 | 5.000 | 5.000 |
+| C17 | Material de consumo | Subvenção | Impressão de cartazes. folhetos e termos de consentimento com QR Code para os testes comunitários. | 1 | 1.500 | 1.500 |
+| C18 | Passagens áreas e/ou terrestres nacionais | Subvenção | Passagens para participação em evento nacional de gestão em saúde (ex.: Congresso CONASEMS) para prospecção de municípios. | 2 | 1.000 | 2.000 |
+| C19 | Serviços de Terceiros PJ | Subvenção | Registro da marca Direciona.AI no INPI (taxas e assessoria). item de propriedade intelectual previsto no edital. | 1 | 1.500 | 1.500 |
+| C20 | Serviços de Terceiros PJ | Contrapartida | Serviços de contabilidade da empresa durante a execução do projeto (despesa administrativa coberta com recursos próprios). | 12 | 320 | 3.840 |
 
+### Capital
+| # | Rubrica | Origem | Descrição e justificativa | Qtd | Unit. (R$) | Total (R$) |
+|---|---|---|---|---|---|---|
+| K1 | Equipamentos e material permanente | Subvenção | Notebook para desenvolvimento. compilação e testes da plataforma. | 1 | 6.500 | 6.500 |
+| K2 | Equipamentos e material permanente | Subvenção | Celular Android de entrada para testar o app em aparelho igual ao do público-alvo. | 1 | 1.300 | 1.300 |
+| K3 | Equipamentos e material permanente | Subvenção | iPhone para testes das versões iOS do app. | 1 | 3.500 | 3.500 |
+
+### Totais
 | | Subvenção | Contrapartida | Total |
 |---|---|---|---|
-| Custeio | 122.500 | 6.400 | 128.900 |
-| Capital | 5.500 | 0 | 5.500 |
-| **Total geral** | **128.000** | **6.400** | **134.400** |
+| Custeio | 116.700 | 3.840 | 120.540 |
+| Capital | 11.300 | 0 | 11.300 |
+| **Total geral** | **128.000** | **3.840** (3%) | **131.840** |
 
-*As bolsas do CNPq (até R$ 45.580) são à parte: podem financiar dedicação extra da equipe ou de um bolsista, sem pagar duas vezes a mesma pessoa pela mesma atividade.*
+**Como o dinheiro se distribui:** construir o produto (C1–C3, C8) 47% · segurança clínica e jurídica (C4–C7) 17% · manter funcionando (C9–C14) 16% · equipamentos 9% · testes e vendas (C15–C19) 11%.
 
----
-
-## RESUMO DO NEGÓCIO
-
-### Resumo
-*454/500 caracteres*
-
-O Direciona.AI orienta o cidadão, por WhatsApp, app ou voz, sobre onde buscar atendimento no SUS (UBS, UPA ou SAMU 192) antes de sair de casa, reduzindo casos leves nas UPAs. Uma guarda de emergência e protocolos validados por médicos garantem a segurança; a IA só interpreta a fala. A prefeitura assina a plataforma (SaaS B2G) e recebe painel com dados anonimizados da demanda. Com o Centelha, vamos concluir o MVP e validá-lo em piloto municipal no RJ.
+**Fora do orçamento, de propósito:** pró-labore e salários (proibidos), pagamento a membros da equipe (proibido), contingência genérica, gastos anteriores ao Termo de Outorga, eventos próprios e coffee break, anúncios para o cidadão.
 
 ---
 
-## Como os textos respondem aos avaliadores da Fase 1
+## RESUMO
 
-| Crítica | Onde foi respondida |
-|---|---|
-| Como atrair cidadãos e gestores | Monetização (divulgação via prefeitura, QR Code, ACS, COSEMS) e Mercado (canais) |
-| Interface para baixa renda e escolaridade | Descrição, Segmento, Negativos (WhatsApp, voz, linguagem simples, offline) e Etapa 4 do cronograma |
-| Análise comparativa com concorrentes | Mercado (d) e Descrição (c) |
-| Resultados do teste do protótipo | **[FALTA DADO]** Mercado (c) e PDF de evidências |
-| "Hospitais já têm IA de fila" | Descrição (a, c): a IA deles atua dentro do hospital, depois da chegada; a de vocês atua antes, na rede toda |
+### Resumo do negócio
+*441/500 caracteres*
+
+O Direciona.AI é uma plataforma que a prefeitura contrata para orientar o cidadão, pelo WhatsApp, app com a marca do município ou voz, sobre onde buscar atendimento no SUS (UBS, UPA ou SAMU 192), reduzindo casos leves nas UPAs. Guarda de emergência e protocolos validados garantem a segurança. A prefeitura assina (SaaS B2G) e recebe painel com dados anonimizados. Com o Centelha, faremos a plataforma replicável, testada com usuários reais.
+
