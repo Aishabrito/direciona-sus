@@ -5,7 +5,7 @@
 ## Decisões tomadas
 
 - **Produto do Centelha ≠ JCC.** O JCC é o protótipo (app + bot). O Centelha é a plataforma replicável vendida a prefeituras: um código só, configurado por cidade, com app e WhatsApp com a marca de cada prefeitura e painel do gestor.
-- **Equipe:** Aisha (coordenação e desenvolvimento), Pamella (negócios, 20h/semana), segundo desenvolvedor (na equipe, sem bolsa), Célia Cristina Guedes Brito, enfermeira mestre em Saúde da Família (vínculo atual a confirmar). Bolsas CNPq (R$ 45.580) só para Aisha e Pamella. **As bolsas não entram na tabela de orçamento.**
+- **Equipe:** Aisha (coordenação e desenvolvimento), Pamella (negócios, 20h/semana), segundo desenvolvedor (na equipe, sem bolsa), Célia Cristina Guedes Brito, enfermeira, celetista da Prefeitura de Maricá (coordenadora de enfermagem). Bolsas CNPq (R$ 45.580) só para Aisha e Pamella. **As bolsas não entram na tabela de orçamento.**
 - **Edital:** pró-labore e salário proibidos; membro da equipe não pode ser pago pela subvenção; contrapartida mínima de 3%; equipamentos até 50%.
 - **Validação sem depender da prefeitura:** validação clínica, testes com cidadãos (Naves do Conhecimento e projetos sociais) com dados públicos do CNES, painel mostrado a gestores. O piloto oficial é meta, com plano B.
 - **Integração com e-SUS e SINAN:** fica pronta para ligar e é oferecida depois do Centelha, conforme o interesse da prefeitura.
@@ -37,10 +37,10 @@ d) Benefícios: menos casos leves nas UPAs, orientação gratuita ao cidadão e 
 **PDF de evidências (até 5 MB):** prints do app e do WhatsApp (um caso leve → UBS, um grave → 192), diagrama da arquitetura (guarda → IA → validação → unidades), resultado dos testes automáticos dos casos de emergência, trecho da política de dados e, se houver, depoimento de Célia sobre o fluxo.
 
 ### Estratégia de desenvolvimento
-*1482/1500 caracteres*
+*1472/1500 caracteres*
 
 Partimos do protótipo (app e bot de WhatsApp com guarda de emergência) criado no programa Jovens Cientistas Cariocas e o transformamos em plataforma replicável para prefeituras.
-a) Recursos: equipe executora (Aisha e um segundo desenvolvedor no app, bot e motor de regras; Pamella em negócios, 20h/semana; Célia, enfermeira mestre em Saúde da Família e ex-gerente técnica da APS, nos fluxos e protocolos), bolsas CNPq e, pela subvenção: desenvolvimento terceirizado, design, médico consultor, jurídico, nuvem, APIs e equipamentos.
+a) Recursos: equipe executora (Aisha e um segundo desenvolvedor no app, bot e motor de regras; Pamella em negócios, 20h/semana; Célia, enfermeira e ex-gestora de unidades da Atenção Primária, nos fluxos e protocolos), bolsas CNPq e, pela subvenção: desenvolvimento terceirizado, design, médico consultor, jurídico, nuvem, APIs e equipamentos.
 b) Produção: núcleo clínico e app desenvolvidos pela equipe; painel do gestor e área administrativa multi-cidade terceirizados por entregas, com especificação e aceite pela equipe. Código único com versão do app gerada para cada prefeitura, entregas mensais, testes automáticos dos casos de emergência a cada versão e regras versionadas e auditáveis.
 c) Pesquisas: validação dos critérios de encaminhamento (Protocolo de Manchester e Carteira de Serviços da APS) por Célia e por médico consultor; casos simulados para medir acerto e segurança; testes de usabilidade com idosos e pessoas de baixa escolaridade; testes com cidadãos em Naves do Conhecimento e projetos sociais, usando unidades reais (dados públicos do CNES).
 d) Certificação: avaliação do enquadramento como Software como Dispositivo Médico (RDC 657/2022 da ANVISA) com assessoria jurídica, relatório de impacto à proteção de dados (LGPD), teste de segurança e registro da marca no INPI.
@@ -195,18 +195,18 @@ Ferramentas: GitHub (código e tarefas), Trello/Notion, CRM gratuito (HubSpot), 
 ## EQUIPE: Célia
 
 **Vínculo com o projeto:** Consultor(a) voluntário (ou Sócio, se ela entrar na sociedade)  
-**Formação:** Pós-graduação (concluído): Mestrado em Saúde da Família [instituição: conferir no Lattes]  
+**Formação:** Pós-graduação: Mestrado profissional em Saúde da Família, Universidade Estácio de Sá (marcar "concluído" só se o Lattes for atualizado; senão, "cursando")  
 **Lattes:** https://lattes.cnpq.br/3422425759379860
 
 ### Experiência e competência
-*962/1500 caracteres*
+*1037/1500 caracteres*
 
-Enfermeira com mais de 18 anos de experiência em assistência, gestão e educação em saúde no SUS. Mestre em Saúde da Família, especialista em Gestão Pública em Saúde e em Saúde Pública. Foi Gerente Técnica e Institucional da Atenção Primária e Gerente de Serviços de Saúde da Unidade de Saúde da Família Barroco, responsável por equipes, indicadores e processos de trabalho. Coordenou a enfermagem de Centro de Diagnóstico e Tratamento e de Serviço de Atenção Domiciliar, implantando fluxos assistenciais, linhas de cuidado, protocolos clínicos e POPs. Tem vivência assistencial em Emergência, CTI adulto e Estratégia Saúde da Família, e atua em educação permanente como preceptora de residência e facilitadora do CEDAPS. No Direciona.AI, responde pelos fluxos de encaminhamento entre Atenção Primária, UPA e SAMU, pela validação dos protocolos com o médico consultor, pelo desenho dos testes com usuários e pelo treinamento das equipes municipais na implantação.
+Enfermeira com mais de 18 anos de experiência em assistência, gestão e educação em saúde no SUS, com mestrado profissional em Saúde da Família (UNESA) e especializações em Gestão Pública em Saúde (UNICAMP) e Saúde Pública (Fiocruz). Foi gerente técnica de Clínica da Família no Rio de Janeiro e gestora de unidade básica em Maricá, respondendo por equipes, indicadores, acesso e organização dos processos de trabalho. Hoje coordena a enfermagem do Serviço de Atenção Domiciliar e do Centro de Diagnóstico e Tratamento em Maricá, onde elaborou e implantou protocolos, POPs, fluxos assistenciais e linhas de cuidado. Ministrou capacitações em atenção básica para profissionais de diferentes municípios (Programa Ciclo Saúde), é docente em especialização em Saúde da Família e consultora do CEDAPS. No Direciona.AI, responde pelos fluxos de encaminhamento entre Atenção Primária, UPA e SAMU, pela validação dos protocolos com o médico consultor, pelo desenho dos testes com usuários e pelo treinamento das equipes municipais na implantação.
 
 ### Essa equipe é ideal porque
-*761/1500 caracteres*
+*808/1500 caracteres*
 
-A equipe une quem constrói, quem vende e quem conhece o SUS por dentro. Aisha, desenvolvedora full-stack, criou o protótipo atual (app e bot de WhatsApp com guarda de emergência) e lidera a tecnologia com um segundo desenvolvedor, mantendo o núcleo do produto dentro da empresa. Pamella, economista com experiência em estratégia, dados e processos, conduz o modelo de negócio, os indicadores e a relação com prefeituras. Célia, enfermeira mestre em Saúde da Família com mais de 18 anos no SUS, foi gerente técnica da Atenção Primária e implantou protocolos e linhas de cuidado: conhece a rotina das unidades e fala a língua do gestor que compra a solução. Juntas, cobrimos tecnologia, negócio e prática assistencial, com validação médica externa dos protocolos.
+A equipe une quem constrói, quem vende e quem conhece o SUS por dentro. Aisha, desenvolvedora full-stack, criou o protótipo atual (app e bot de WhatsApp com guarda de emergência) e lidera a tecnologia com um segundo desenvolvedor, mantendo o núcleo do produto dentro da empresa. Pamella, economista com experiência em estratégia, dados e processos, conduz o modelo de negócio, os indicadores e a relação com prefeituras. Célia, enfermeira com mais de 18 anos no SUS, foi gerente de Clínica da Família no Rio e de unidade básica em Maricá, implantou protocolos e linhas de cuidado e já capacitou equipes de vários municípios: conhece a rotina das unidades e fala a língua do gestor que compra a solução. Juntas, cobrimos tecnologia, negócio e prática assistencial, com validação médica externa dos protocolos.
 
 ---
 
