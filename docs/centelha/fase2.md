@@ -5,7 +5,7 @@
 ## Decisões tomadas
 
 - **Produto do Centelha ≠ JCC.** O JCC é o protótipo (app + bot). O Centelha é a plataforma replicável vendida a prefeituras: um código só, configurado por cidade, com app e WhatsApp com a marca de cada prefeitura e painel do gestor.
-- **Equipe:** Aisha (coordenação e desenvolvimento), Pamella (negócios, 20h/semana), segundo desenvolvedor (na equipe, sem bolsa), enfermeira gerente de UBS há mais de 20 anos (CLT de OS; confirmar). Bolsas CNPq (R$ 45.580) só para Aisha e Pamella. **As bolsas não entram na tabela de orçamento.**
+- **Equipe:** Aisha (coordenação e desenvolvimento), Pamella (negócios, 20h/semana), segundo desenvolvedor (na equipe, sem bolsa), Célia Cristina Guedes Brito, enfermeira mestre em Saúde da Família (vínculo atual a confirmar). Bolsas CNPq (R$ 45.580) só para Aisha e Pamella. **As bolsas não entram na tabela de orçamento.**
 - **Edital:** pró-labore e salário proibidos; membro da equipe não pode ser pago pela subvenção; contrapartida mínima de 3%; equipamentos até 50%.
 - **Validação sem depender da prefeitura:** validação clínica, testes com cidadãos (Naves do Conhecimento e projetos sociais) com dados públicos do CNES, painel mostrado a gestores. O piloto oficial é meta, com plano B.
 - **Integração com e-SUS e SINAN:** fica pronta para ligar e é oferecida depois do Centelha, conforme o interesse da prefeitura.
@@ -13,7 +13,7 @@
 ## Pendências
 
 1. Universidade: o cadastro diz UNIRIO e o texto diz UFRJ. Corrigir na aba Equipe.
-2. Cadastrar a enfermeira e o segundo desenvolvedor na equipe, com carta de anuência de cada um. Confirmar que a enfermeira não é servidora pública.
+2. Cadastrar Célia e o segundo desenvolvedor na equipe, com carta de anuência de cada um. Se Célia for servidora pública, ela precisa da carta de anuência da instituição de vínculo (Anexo II).
 3. Resultados de testes do protótipo do JCC, se houver, em Mercado (c) e no PDF de evidências.
 4. Apple: apps replicados por cliente costumam ter de ser publicados na conta da própria prefeitura (diretriz 4.2.6). Prever isso no contrato.
 5. Nuvem, IA e Apple cobram em dólar. Na prestação de contas, prefiram fornecedores com nota fiscal no Brasil.
@@ -34,15 +34,15 @@ d) Benefícios: menos casos leves nas UPAs, orientação gratuita ao cidadão e 
 **Estágio atual:** Protótipo testado  
 **Estágio pretendido:** MVP
 
-**PDF de evidências (até 5 MB):** prints do app e do WhatsApp (um caso leve → UBS, um grave → 192), diagrama da arquitetura (guarda → IA → validação → unidades), resultado dos testes automáticos dos casos de emergência, trecho da política de dados e, se houver, depoimento da enfermeira sobre o fluxo.
+**PDF de evidências (até 5 MB):** prints do app e do WhatsApp (um caso leve → UBS, um grave → 192), diagrama da arquitetura (guarda → IA → validação → unidades), resultado dos testes automáticos dos casos de emergência, trecho da política de dados e, se houver, depoimento de Célia sobre o fluxo.
 
 ### Estratégia de desenvolvimento
-*1459/1500 caracteres*
+*1482/1500 caracteres*
 
 Partimos do protótipo (app e bot de WhatsApp com guarda de emergência) criado no programa Jovens Cientistas Cariocas e o transformamos em plataforma replicável para prefeituras.
-a) Recursos: equipe executora (Aisha e um segundo desenvolvedor no app, bot e motor de regras; Pamella em negócios, 20h/semana; enfermeira gerente de UBS há 20+ anos nos fluxos da Atenção Primária), bolsas CNPq e, pela subvenção: desenvolvimento terceirizado, design, médico consultor, jurídico, nuvem, APIs e equipamentos.
+a) Recursos: equipe executora (Aisha e um segundo desenvolvedor no app, bot e motor de regras; Pamella em negócios, 20h/semana; Célia, enfermeira mestre em Saúde da Família e ex-gerente técnica da APS, nos fluxos e protocolos), bolsas CNPq e, pela subvenção: desenvolvimento terceirizado, design, médico consultor, jurídico, nuvem, APIs e equipamentos.
 b) Produção: núcleo clínico e app desenvolvidos pela equipe; painel do gestor e área administrativa multi-cidade terceirizados por entregas, com especificação e aceite pela equipe. Código único com versão do app gerada para cada prefeitura, entregas mensais, testes automáticos dos casos de emergência a cada versão e regras versionadas e auditáveis.
-c) Pesquisas: validação dos critérios de encaminhamento (Protocolo de Manchester e Carteira de Serviços da APS) pela enfermeira e por médico consultor; casos simulados para medir acerto e segurança; testes de usabilidade com idosos e pessoas de baixa escolaridade; testes com cidadãos em Naves do Conhecimento e projetos sociais, usando unidades reais (dados públicos do CNES).
+c) Pesquisas: validação dos critérios de encaminhamento (Protocolo de Manchester e Carteira de Serviços da APS) por Célia e por médico consultor; casos simulados para medir acerto e segurança; testes de usabilidade com idosos e pessoas de baixa escolaridade; testes com cidadãos em Naves do Conhecimento e projetos sociais, usando unidades reais (dados públicos do CNES).
 d) Certificação: avaliação do enquadramento como Software como Dispositivo Médico (RDC 657/2022 da ANVISA) com assessoria jurídica, relatório de impacto à proteção de dados (LGPD), teste de segurança e registro da marca no INPI.
 
 ---
@@ -106,9 +106,9 @@ Escalabilidade: o mesmo software atende novos municípios apenas com configuraç
 ## GESTÃO
 
 ### Gestão do negócio
-*841/1000 caracteres*
+*853/1000 caracteres*
 
-Papéis: Aisha (coordenação, produto e tecnologia); segundo desenvolvedor (app, bot e integrações); Pamella (negócios, finanças e relação com prefeituras); enfermeira (fluxos e qualidade assistencial). Ritos: planejamento mensal por metas (OKRs), reunião semanal e revisão clínica mensal das regras.
+Papéis: Aisha (coordenação, produto e tecnologia); segundo desenvolvedor (app, bot e integrações); Pamella (negócios, finanças e relação com prefeituras); Célia (fluxos, protocolos e implantação nas prefeituras). Ritos: planejamento mensal por metas (OKRs), reunião semanal e revisão clínica mensal das regras.
 Métricas de produto: conversas/mês, % de casos leves orientados à UBS, % de emergências encaminhadas ao 192, conclusão da triagem, satisfação e disponibilidade.
 Métricas de negócio: prefeituras no funil, reuniões, propostas, contratos, receita recorrente, custo por município e caixa.
 Qualidade: casos críticos testados a cada versão, registro de incidentes, controles LGPD e aceite formal das entregas terceirizadas.
@@ -124,8 +124,8 @@ Ferramentas: GitHub (código e tarefas), Trello/Notion, CRM gratuito (HubSpot), 
 | Etapa | Atividade | Descrição | Indicadores | Início | Fim |
 |---|---|---|---|---|---|
 | **1. Estruturação** | 1.1 Estruturação da empresa e do projeto | Conta do projeto, contabilidade, ferramentas de gestão e cotação de preços dos fornecedores | Fornecedores contratados com cotação registrada | M1 | M2 |
-| | 1.2 Especificação da plataforma | Requisitos do painel e da área multi-cidade, validados com a enfermeira | Documento de requisitos aprovado | M1 | M2 |
-| **2. Validação clínica e segurança** | 2.1 Protocolos de encaminhamento | Enfermeira e médico consultor revisam critérios UBS/UPA/192 (Manchester e Carteira de Serviços da APS) | Relatório de validação assinado | M1 | M3 |
+| | 1.2 Especificação da plataforma | Requisitos do painel e da área multi-cidade, validados com Célia | Documento de requisitos aprovado | M1 | M2 |
+| **2. Validação clínica e segurança** | 2.1 Protocolos de encaminhamento | Célia e o médico consultor revisam critérios UBS/UPA/192 (Manchester e Carteira de Serviços da APS) | Relatório de validação assinado | M1 | M3 |
 | | 2.2 Bateria de casos simulados | Casos clínicos simulados comparando a orientação do sistema com a dos profissionais | 300 casos; 100% das emergências críticas escaladas; ≥ 90% de concordância | M2 | M4 |
 | | 2.3 LGPD e regulatório | RIPD, termos, termo de consentimento e parecer ANVISA | Documentos e parecer concluídos | M1 | M3 |
 | **3. Plataforma multi-cidade** | 3.1 Área administrativa | Cadastro de unidades, horários e regras por município, com dados do CNES | Nova cidade configurada em ≤ 2 dias | M2 | M5 |
@@ -138,7 +138,7 @@ Ferramentas: GitHub (código e tarefas), Trello/Notion, CRM gratuito (HubSpot), 
 | **5. Testes com cidadãos** | 5.1 Usabilidade | Testes em Naves do Conhecimento e projetos sociais com idosos e pessoas de baixa escolaridade | ≥ 60 participantes (≥ 20 idosos); nota SUS ≥ 70 | M5 | M7 |
 | | 5.2 Teste comunitário ampliado | Uso livre do app e do WhatsApp configurados com unidades reais, com auditoria clínica de amostra | ≥ 300 usuários; ≥ 85% de satisfação; ≥ 90% de concordância na amostra auditada | M7 | M10 |
 | | 5.3 Ajustes | Melhorias de linguagem, fluxo e regras a partir dos testes | Versão MVP publicada | M8 | M10 |
-| **6. Prefeituras e vendas** | 6.1 Kit comercial | Proposta, preços, modelos de contrato (dispensa e CPSI), site e vídeo | Kit pronto | M6 | M8 |
+| **6. Prefeituras e vendas** | 6.1 Kit comercial | Proposta, preços, modelos de contrato (dispensa e CPSI), site, vídeo e manual de implantação e treinamento das equipes municipais (Célia) | Kit e manual prontos | M6 | M8 |
 | | 6.2 Prospecção | Apresentações a secretarias da Região Metropolitana (ex.: Maricá), COSEMS-RJ e eventos | ≥ 10 secretarias contatadas; ≥ 5 apresentações; 1 evento nacional | M6 | M12 |
 | | 6.3 Piloto assistido *(meta)* | Termo de cooperação, sem custo, para uso oficial numa unidade ou região. **Plano B:** ampliar o teste comunitário | 1 termo firmado **ou** teste comunitário com ≥ 500 usuários | M8 | M12 |
 | | 6.4 Primeira negociação | Proposta comercial formal a um município interessado | 1 proposta formal em negociação | M10 | M12 |
@@ -189,6 +189,24 @@ Ferramentas: GitHub (código e tarefas), Trello/Notion, CRM gratuito (HubSpot), 
 **Como o dinheiro se distribui:** construir o produto (C1–C3, C8) 47% · segurança clínica e jurídica (C4–C7) 17% · manter funcionando (C9–C14) 16% · equipamentos 9% · testes e vendas (C15–C19) 11%.
 
 **Fora do orçamento, de propósito:** pró-labore e salários (proibidos), pagamento a membros da equipe (proibido), contingência genérica, gastos anteriores ao Termo de Outorga, eventos próprios e coffee break, anúncios para o cidadão.
+
+---
+
+## EQUIPE: Célia
+
+**Vínculo com o projeto:** Consultor(a) voluntário (ou Sócio, se ela entrar na sociedade)  
+**Formação:** Pós-graduação (concluído): Mestrado em Saúde da Família [instituição: conferir no Lattes]  
+**Lattes:** https://lattes.cnpq.br/3422425759379860
+
+### Experiência e competência
+*962/1500 caracteres*
+
+Enfermeira com mais de 18 anos de experiência em assistência, gestão e educação em saúde no SUS. Mestre em Saúde da Família, especialista em Gestão Pública em Saúde e em Saúde Pública. Foi Gerente Técnica e Institucional da Atenção Primária e Gerente de Serviços de Saúde da Unidade de Saúde da Família Barroco, responsável por equipes, indicadores e processos de trabalho. Coordenou a enfermagem de Centro de Diagnóstico e Tratamento e de Serviço de Atenção Domiciliar, implantando fluxos assistenciais, linhas de cuidado, protocolos clínicos e POPs. Tem vivência assistencial em Emergência, CTI adulto e Estratégia Saúde da Família, e atua em educação permanente como preceptora de residência e facilitadora do CEDAPS. No Direciona.AI, responde pelos fluxos de encaminhamento entre Atenção Primária, UPA e SAMU, pela validação dos protocolos com o médico consultor, pelo desenho dos testes com usuários e pelo treinamento das equipes municipais na implantação.
+
+### Essa equipe é ideal porque
+*761/1500 caracteres*
+
+A equipe une quem constrói, quem vende e quem conhece o SUS por dentro. Aisha, desenvolvedora full-stack, criou o protótipo atual (app e bot de WhatsApp com guarda de emergência) e lidera a tecnologia com um segundo desenvolvedor, mantendo o núcleo do produto dentro da empresa. Pamella, economista com experiência em estratégia, dados e processos, conduz o modelo de negócio, os indicadores e a relação com prefeituras. Célia, enfermeira mestre em Saúde da Família com mais de 18 anos no SUS, foi gerente técnica da Atenção Primária e implantou protocolos e linhas de cuidado: conhece a rotina das unidades e fala a língua do gestor que compra a solução. Juntas, cobrimos tecnologia, negócio e prática assistencial, com validação médica externa dos protocolos.
 
 ---
 
