@@ -134,7 +134,7 @@ Ferramentas: GitHub (código e tarefas), Trello/Notion, CRM gratuito (HubSpot), 
 | **5. Testes com cidadãos** | 5.1 Usabilidade | Testes em Naves do Conhecimento e projetos sociais com idosos e pessoas de baixa escolaridade | ≥ 60 participantes (≥ 20 idosos); nota SUS ≥ 70 | M5 | M7 |
 | | 5.2 Teste comunitário ampliado | Uso livre do app e do WhatsApp configurados com unidades reais, com auditoria clínica de amostra | ≥ 300 usuários; ≥ 85% de satisfação; ≥ 90% de concordância na amostra auditada | M7 | M10 |
 | | 5.3 Ajustes | Melhorias de linguagem, fluxo e regras a partir dos testes | Versão MVP publicada | M8 | M10 |
-| **6. Prefeituras e vendas** | 6.1 Kit comercial | Proposta, preços, modelos de contrato (dispensa e CPSI), site, vídeo e manual de implantação e treinamento das equipes municipais (Célia) | Kit e manual prontos | M6 | M8 |
+| **6. Prefeituras e vendas** | 6.1 Kit comercial | Proposta, preços, modelos de contrato (dispensa e CPSI), site, vídeo, roteiro de apresentação (com consultoria comercial) e manual de implantação e treinamento das equipes municipais (Célia) | Kit e manual prontos | M6 | M8 |
 | | 6.2 Prospecção | Apresentações a secretarias da Região Metropolitana (ex.: Maricá), COSEMS-RJ e eventos | ≥ 10 secretarias contatadas; ≥ 5 apresentações; 1 evento nacional | M6 | M12 |
 | | 6.3 Piloto assistido *(meta)* | Termo de cooperação, sem custo, para uso oficial numa unidade ou região. **Plano B:** ampliar o teste comunitário | 1 termo firmado **ou** teste comunitário com ≥ 500 usuários | M8 | M12 |
 | | 6.4 Primeira negociação | Proposta comercial formal a um município interessado | 1 proposta formal em negociação | M10 | M12 |
@@ -147,14 +147,14 @@ Ferramentas: GitHub (código e tarefas), Trello/Notion, CRM gratuito (HubSpot), 
 ### Custeio
 | # | Rubrica | Origem | Descrição e justificativa | Qtd | Unit. (R$) | Total (R$) |
 |---|---|---|---|---|---|---|
-| C1 | Serviços de Terceiros PJ | Subvenção | Desenvolvimento do painel web do gestor (indicadores de demanda. mapa de calor. perfis de acesso). contratado por entregas com aceite da equipe. Estimativa: 375 h × R$ 80/h (referência de desenvolvedor pleno PJ). | 1 | 30.000 | 30.000 |
-| C2 | Serviços de Terceiros PJ | Subvenção | Desenvolvimento da área administrativa multi-cidade (cadastro de unidades. horários e regras; configuração do app e do WhatsApp de cada prefeitura). por entregas. Estimativa: 206 h × R$ 80/h. | 1 | 16.500 | 16.500 |
-| C3 | Serviços de Terceiros PF | Subvenção | Design de interface do painel do gestor e do modelo visual do app adaptável à marca de cada prefeitura. com foco em acessibilidade. Estimativa: 100 h × R$ 80/h. | 1 | 8.000 | 8.000 |
+| C1 | Serviços de Terceiros PJ | Subvenção | Desenvolvimento do painel web do gestor (indicadores de demanda. mapa de calor. perfis de acesso). contratado por entregas com aceite da equipe. Estimativa: 340 h × R$ 80/h (referência de desenvolvedor pleno PJ). | 1 | 27.200 | 27.200 |
+| C2 | Serviços de Terceiros PJ | Subvenção | Desenvolvimento da área administrativa multi-cidade (cadastro de unidades. horários e regras; configuração do app e do WhatsApp de cada prefeitura). por entregas. Estimativa: 190 h × R$ 80/h. | 1 | 15.200 | 15.200 |
+| C3 | Serviços de Terceiros PF | Subvenção | Design de interface do painel do gestor e do modelo visual do app adaptável à marca de cada prefeitura. com foco em acessibilidade. Estimativa: 75 h × R$ 80/h. | 1 | 6.000 | 6.000 |
 | C4 | Serviços de Terceiros PF | Subvenção | Médico(a) consultor(a): revisão e validação dos protocolos de encaminhamento (UBS/UPA/192) e da bateria de casos simulados. com relatório técnico assinado. Estimativa: 40 h × R$ 200/h. | 1 | 8.000 | 8.000 |
 | C5 | Serviços de Terceiros PF | Subvenção | Médico(a) consultor(a): auditoria clínica de amostra das orientações dadas nos testes com usuários reais. com relatório. Estimativa: 20 h × R$ 200/h. | 1 | 4.000 | 4.000 |
 | C6 | Serviços de Terceiros PJ | Subvenção | Assessoria jurídica em proteção de dados: relatório de impacto (RIPD). termos de uso. política de privacidade e termo de consentimento dos testes (LGPD). | 1 | 5.000 | 5.000 |
 | C7 | Serviços de Terceiros PJ | Subvenção | Assessoria jurídica: modelo de contrato e de termo de cooperação com prefeituras (dispensa e CPSI) e parecer sobre enquadramento na RDC 657/2022 da ANVISA. | 1 | 5.000 | 5.000 |
-| C8 | Serviços de Terceiros PJ | Subvenção | Teste de segurança (pentest) da plataforma e do painel antes da apresentação a prefeituras. exigência comum de áreas de TI municipais. | 1 | 6.000 | 6.000 |
+| C8 | Serviços de Terceiros PJ | Subvenção | Teste de segurança (pentest) da plataforma e do painel antes da apresentação a prefeituras. exigência comum de áreas de TI municipais. | 1 | 4.500 | 4.500 |
 | C9 | Serviços de Terceiros PJ | Subvenção | Hospedagem em nuvem (servidor da aplicação e banco de dados) durante os 12 meses. | 12 | 600 | 7.200 |
 | C10 | Serviços de Terceiros PJ | Subvenção | WhatsApp Business API (mensagens e números dos ambientes de teste e demonstração). | 12 | 350 | 4.200 |
 | C11 | Serviços de Terceiros PJ | Subvenção | APIs de IA para interpretação de texto e de voz (transcrição de áudio e fala). usadas pelo assistente. | 12 | 400 | 4.800 |
@@ -163,26 +163,29 @@ Ferramentas: GitHub (código e tarefas), Trello/Notion, CRM gratuito (HubSpot), 
 | C14 | Serviços de Terceiros PJ | Subvenção | Contas de desenvolvedor Google Play e Apple para publicação das versões do app. | 1 | 800 | 800 |
 | C15 | Diárias ou despesas de hospedagem. alimentação e locomoção | Subvenção | Locomoção (combustível e pedágio) da equipe para testes comunitários e reuniões com secretarias municipais de saúde da Região Metropolitana. | 24 | 150 | 3.600 |
 | C16 | Serviços de Terceiros PJ | Subvenção | Site institucional e vídeo de demonstração da plataforma para apresentação a prefeituras. | 1 | 5.000 | 5.000 |
-| C17 | Material de consumo | Subvenção | Impressão de cartazes. folhetos e termos de consentimento com QR Code para os testes comunitários. | 1 | 1.500 | 1.500 |
+| C17 | Material de consumo | Subvenção | Impressão de cartazes. folhetos e termos de consentimento com QR Code para os testes comunitários. | 1 | 1.400 | 1.400 |
 | C18 | Passagens áreas e/ou terrestres nacionais | Subvenção | Passagens para participação em evento nacional de gestão em saúde (ex.: Congresso CONASEMS) para prospecção de municípios. | 2 | 1.000 | 2.000 |
-| C19 | Serviços de Terceiros PJ | Subvenção | Registro da marca Direciona.AI no INPI (taxas e assessoria). item de propriedade intelectual previsto no edital. | 1 | 1.500 | 1.500 |
-| C20 | Serviços de Terceiros PJ | Contrapartida | Serviços de contabilidade da empresa durante a execução do projeto (despesa administrativa coberta com recursos próprios). | 12 | 320 | 3.840 |
+| C19 | Serviços de Terceiros PJ | Subvenção | Consultoria comercial especializada em vendas para o setor público: estratégia de entrada em prefeituras. precificação. proposta comercial e roteiro de apresentação a secretarias de saúde. | 1 | 5.000 | 5.000 |
+| C20 | Serviços de Terceiros PJ | Subvenção | Inscrições em eventos de gestão em saúde (ex.: Congresso CONASEMS e encontros do COSEMS-RJ) para prospecção de municípios. | 2 | 800 | 1.600 |
+| C21 | Diárias ou despesas de hospedagem. alimentação e locomoção | Subvenção | Hospedagem e alimentação de 2 membros da equipe durante evento nacional de gestão em saúde (3 dias). para apresentação da solução a gestores municipais. | 6 | 300 | 1.800 |
+| C22 | Serviços de Terceiros PJ | Subvenção | Registro da marca Direciona.AI no INPI (taxas e assessoria). item de propriedade intelectual previsto no edital. | 1 | 1.500 | 1.500 |
+| C23 | Serviços de Terceiros PJ | Contrapartida | Serviços de contabilidade da empresa durante a execução do projeto (despesa administrativa coberta com recursos próprios). | 12 | 320 | 3.840 |
 
 ### Capital
 | # | Rubrica | Origem | Descrição e justificativa | Qtd | Unit. (R$) | Total (R$) |
 |---|---|---|---|---|---|---|
-| K1 | Equipamentos e material permanente | Subvenção | Notebook para desenvolvimento. compilação e testes da plataforma. | 1 | 6.500 | 6.500 |
+| K1 | Equipamentos e material permanente | Subvenção | Notebook para desenvolvimento. compilação e testes da plataforma. | 1 | 5.800 | 5.800 |
 | K2 | Equipamentos e material permanente | Subvenção | Celular Android de entrada para testar o app em aparelho igual ao do público-alvo. | 1 | 1.300 | 1.300 |
 | K3 | Equipamentos e material permanente | Subvenção | iPhone para testes das versões iOS do app. | 1 | 3.500 | 3.500 |
 
 ### Totais
 | | Subvenção | Contrapartida | Total |
 |---|---|---|---|
-| Custeio | 116.700 | 3.840 | 120.540 |
-| Capital | 11.300 | 0 | 11.300 |
+| Custeio | 117.400 | 3.840 | 121.240 |
+| Capital | 10.600 | 0 | 10.600 |
 | **Total geral** | **128.000** | **3.840** (3%) | **131.840** |
 
-**Como o dinheiro se distribui:** construir o produto (C1–C3, C8) 47% · segurança clínica e jurídica (C4–C7) 17% · manter funcionando (C9–C14) 16% · equipamentos 9% · testes e vendas (C15–C19) 11%.
+**Como o dinheiro se distribui:** construir o produto (C1–C3, C8) 41% · segurança clínica e jurídica (C4–C7) 17% · manter funcionando (C9–C14) 16% · equipamentos 8% · testes, marketing, vendas e marca (C15–C22) 17%, dos quais marketing e comercial (C16–C21) somam R$ 16.800 (13%).
 
 **Fora do orçamento, de propósito:** pró-labore e salários (proibidos), pagamento a membros da equipe (proibido), contingência genérica, gastos anteriores ao Termo de Outorga, eventos próprios e coffee break, anúncios para o cidadão.
 

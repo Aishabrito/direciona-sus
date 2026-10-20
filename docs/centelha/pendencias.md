@@ -27,7 +27,7 @@
 - [ ] **Mercado (c):** completar o trecho [COMPLETAR] com testes ou entrevistas já feitos no JCC, ou apagar o colchete
 - [ ] **Gestão:** colar o texto; marcar maturidade atual *Identificação dos requisitos do cliente* e pretendida *Negociação da primeira venda*
 - [ ] **Cronograma:** preencher as 7 etapas e 21 atividades (M1 = primeiro mês após o Termo de Outorga)
-- [ ] **Orçamento:** preencher as 23 linhas e conferir os totais: subvenção R$ 128.000 e contrapartida R$ 3.840
+- [ ] **Orçamento:** preencher as 26 linhas (23 de custeio e 3 de capital) e conferir os totais: subvenção R$ 128.000 e contrapartida R$ 3.840
 - [ ] **Resumo:** colar o texto
 - [ ] **Mídias:** ver o que a aba pede (vídeo, imagens) e preparar
 
