@@ -33,13 +33,14 @@
 
 ## 3. PDF de evidências (até 5 MB)
 
-- [ ] Prints do app (abertura, chat, lista de unidades com rota)
-- [ ] Prints do WhatsApp: um caso leve indo para a UBS e um grave indo para o 192
-- [ ] Diagrama da arquitetura: guarda de emergência → IA → validação → unidades próximas
-- [ ] Resultado dos testes automáticos dos casos de emergência
-- [ ] Trecho da política de dados (sem CPF, relato não armazenado)
-- [ ] Opcional: depoimento curto da Célia sobre o fluxo
-- [ ] Juntar tudo, conferir se está abaixo de 5 MB e anexar
+Rascunho pronto: [evidencias-direciona-ai.pdf](evidencias-direciona-ai.pdf) (8 páginas, 1,2 MB). Fonte em `direciona-plataforma/docs/evidencias/`.
+
+- [x] Prints do app, gerados do código atual (Rio e Maricá)
+- [x] Diagrama da arquitetura: app, WhatsApp e painel
+- [x] Resultado do teste da guarda de emergência (49 de 50)
+- [x] Privacidade/LGPD e esboço do painel
+- [ ] **Mandar prints reais do WhatsApp** (um caso leve indo para a UBS e um grave indo para o 192) para eu incluir uma página do canal
+- [ ] Revisar o PDF e anexar no formulário
 
 ## 4. Envio
 
@@ -49,6 +50,8 @@
 ---
 
 ## Depois do resultado (só se for aprovado)
+
+- [ ] Corrigir a guarda de emergência no back.direciona e no app: "a língua dela está inchando" não é reconhecida (a palavra "dela" quebra a regra de reação alérgica grave)
 
 - [ ] Abrir a empresa em até 30 dias após o resultado: ME ou EPP, sede no RJ, objeto social ligado à proposta (MEI e EI não são aceitos)
 - [ ] Abrir a conta exclusiva do projeto e depositar a contrapartida antes de cada parcela
