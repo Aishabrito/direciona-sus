@@ -12,13 +12,7 @@
 
 ## Pendências
 
-1. Universidade: o cadastro diz UNIRIO e o texto diz UFRJ. Corrigir na aba Equipe.
-2. Cadastrar Célia e o segundo desenvolvedor na equipe, com carta de anuência de cada um. Célia é celetista da Prefeitura de Maricá: por segurança, peçam também a carta de anuência da instituição de vínculo (Anexo II) e declarem uma dedicação realista (ex.: 4 h/semana), já que ela tem 40 h lá.
-3. **Lattes da Célia:** o mestrado aparece "em andamento" (desde 2019, sem ano de obtenção), assim como a especialização da Fiocruz, mas o currículo diz que estão concluídos. O avaliador confere o Lattes. Se estiverem concluídos, ela precisa atualizar antes de 22/10. Os textos dizem "com mestrado", que funciona nos dois casos. O vínculo com a Prefeitura do Rio também aparece como "Atual" e deve estar desatualizado.
-4. **Conflito de interesse em Maricá:** como Célia é empregada da Prefeitura de Maricá, a Lei 14.133/2021 (art. 9º) restringe que agente público do órgão contratante participe de contratação com ele. Para a proposta do Centelha isso não é problema, mas, se Maricá virar cliente, ela não pode participar da negociação nem do contrato. Levem a dúvida à assessoria jurídica (item C7) e considerem outra prefeitura como primeiro cliente pago.
-5. Resultados de testes do protótipo do JCC, se houver, em Mercado (c) e no PDF de evidências.
-6. Apple: apps replicados por cliente costumam ter de ser publicados na conta da própria prefeitura (diretriz 4.2.6). Prever isso no contrato.
-7. Nuvem, IA e Apple cobram em dólar. Na prestação de contas, prefiram fornecedores com nota fiscal no Brasil.
+A lista completa, para ir marcando, está em [pendencias.md](pendencias.md).
 
 ---
 
